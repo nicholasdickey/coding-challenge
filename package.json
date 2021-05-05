@@ -50,6 +50,7 @@
     "lodash": "^4",
     "react": "^16",
     "react-dom": "^16",
+    "react-script": "^2.0.5",
     "react-scripts": "^3",
     "typescript": "^3"
   },
@@ -62,7 +63,7 @@
     "@types/react-test-renderer": "^16",
     "@typescript-eslint/eslint-plugin": "^2",
     "@typescript-eslint/parser": "^2",
-    "eslint": "^6",
+    "eslint": "^7.25.0",
     "eslint-config-airbnb": "^18",
     "eslint-config-prettier": "^6",
     "eslint-config-react-app": "^5",

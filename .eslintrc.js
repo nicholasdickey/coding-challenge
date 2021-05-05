@@ -95,6 +95,13 @@ module.exports = {
         '@typescript-eslint/ban-ts-ignore': 0,
       },
     },
+    {
+      files: ['*.js', '*.tsx'],
+      rules: {
+        '@typescript-eslint/recommended': 'off',
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
+      },
+    },
   ],
   settings: {
     'import/resolver': {
