@@ -2,16 +2,16 @@ version: '3'
 services:
   db:
     image: postgres
-    container_name: uplifty-db
+    container_name: code-challenge-db
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
   uplifty:
     build:
       context: .
       dockerfile: ./docker/Docker.server/Dockerfile
-    image: uplifty
+    image: code-challenge
     env_file: .env
-    container_name: uplifty
+    container_name: code-challenge
     volumes:
       - .:/code
     ports:
