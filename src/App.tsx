@@ -5,7 +5,7 @@ import Card from 'Card'
 import shuffle from 'deck'
 
 // eslint-disable-next-line
-import { Game } from 'types'
+import { Game, CardDatum } from 'types'
 
 const TOTAL_CARDS = 52
 const ONE_HAND = 5
@@ -13,13 +13,13 @@ const ONE_HAND = 5
 const initGame = () => {
   return {
     cardsLeft: TOTAL_CARDS,
-    cardsUsed: new Array<number>(),
+    cardsUsed: [] as CardDatum[],
     deck: shuffle(),
-    board: new Array<number>(),
+    board: [] as CardDatum[],
   }
 }
 const deal = ({ cardsLeft, cardsUsed, deck }: Game) => {
-  const board = new Array<number>()
+  const board = [] as CardDatum[]
   let outCardsLeft = cardsLeft
   const outCardsUsed = [...cardsUsed]
   const outDeck = [...deck]

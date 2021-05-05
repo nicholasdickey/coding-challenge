@@ -1,7 +1,10 @@
+import { CardDatum, Suits } from 'types'
+
 const ACE = 1
 const KING = 13
+const NUM_SHUFFLES = 50
 
-function shuffle(deck: Array<number>): Array<number> {
+function shuffle(deck: CardDatum[]): CardDatum[] {
   const returnDeck = deck
   let curId = deck.length
   // There remain elements to shuffle
@@ -16,18 +19,17 @@ function shuffle(deck: Array<number>): Array<number> {
   }
   return returnDeck
 }
-export default function init(): Array<number> {
-  const deck = []
-  for (let suit = 1; suit <= 4; suit += 1) {
-    const shift = 10 ** 1 - 10
-    // assign codes to cards 1(Ace) to 13 (King)
+export default function init(): CardDatum[] {
+  let deck: CardDatum[] = []
 
-    for (let cardNumber = ACE; cardNumber <= KING; cardNumber += 1) {
-      const card = shift + cardNumber
-      console.info('generating card', card)
-      deck.push(card)
+  const suits: Suits[] = ['hearts', 'diamonds', 'clubs', 'spades']
+  suits.forEach(suit => {
+    for (let card = ACE; card <= KING; card += 1) {
+      console.info('generating card', { suit, card })
+      deck.push({ suit, card })
     }
-    console.info('deck created', deck)
-  }
-  return shuffle(deck)
+  })
+  console.info('deck created', deck)
+  for (let i = 0; i < NUM_SHUFFLES; i += 1) deck = shuffle(deck)
+  return deck
 }

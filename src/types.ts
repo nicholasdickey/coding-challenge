@@ -1,12 +1,8 @@
-export interface Game {
+export type Suits = 'hearts' | 'diamonds' | 'clubs' | 'spades'
+export type CardDatum = { suit: Suits; card: number }
+export type Game = {
   cardsLeft: number
-  cardsUsed: Array<number>
-  deck: Array<number>
-  board: Array<number>
-}
-export interface CardParams {
-  x: number
-  y: number
-  offset: number
-  value: number
+  cardsUsed: CardDatum[]
+  deck: CardDatum[]
+  board: CardDatum[]
 }
