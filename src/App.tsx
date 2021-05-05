@@ -20,17 +20,20 @@ const initGame = () => {
 }
 const deal = ({ cardsLeft, cardsUsed, deck }: Game) => {
   const board = new Array<number>()
+  let outCardsLeft = cardsLeft
+  const outCardsUsed = [...cardsUsed]
+  const outDeck = [...deck]
   for (let i = 0; i < ONE_HAND; i += 1) {
-    const nextCard = deck.pop()
+    const nextCard = outDeck.pop()
 
     if (typeof nextCard === 'undefined') break
 
-    cardsUsed.push(nextCard)
+    outCardsUsed.push(nextCard)
     board.push(nextCard)
-    cardsLeft -= 1
-    if (cardsLeft < 0) throw new Error('Unexpected condition -cardsLeft<0')
+    outCardsLeft = cardsLeft - 1
+    if (outCardsLeft < 0) throw new Error('Unexpected condition -cardsLeft<0')
   }
-  return { cardsLeft, cardsUsed, deck, board }
+  return { cardsLeft: outCardsLeft, cardsUsed: outCardsUsed, deck: outDeck, board }
 }
 function App() {
   const [game, setGame] = React.useState(initGame())
