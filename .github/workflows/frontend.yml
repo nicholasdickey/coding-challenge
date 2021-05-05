@@ -2,9 +2,9 @@ name: frontend
 
 on:
   push:
-    branches: [master]
+    branches: [frontend]
   pull_request:
-    branches: [master]
+    branches: [frontend]
     paths:
       - 'src/**/*'
 
@@ -21,7 +21,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Cache node_modules
         uses: actions/cache@main
         id: cache-node
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/upload-artifact@v2-preview
         with:
           name: generated
-          path: "./src/**/__generated__/*"
+          path: './src/**/__generated__/*'
 
   yarn-build:
     runs-on: ubuntu-latest
@@ -48,7 +48,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Restore dependencies
         uses: actions/cache@main
         env:
@@ -73,7 +73,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Restore dependencies
         uses: actions/cache@main
         env:
@@ -91,7 +91,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Restore dependencies
         uses: actions/cache@main
         env:
@@ -109,7 +109,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Restore dependencies
         uses: actions/cache@main
         env:
@@ -128,7 +128,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Restore dependencies
         uses: actions/cache@main
         env:
