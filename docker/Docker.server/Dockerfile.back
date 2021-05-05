@@ -1,15 +1,14 @@
-#FROM python:3.9.4
-FROM nikolaik/python-nodejs:python3.9-nodejs12
+FROM python:3.9.4
 
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && apt-get install -y \
+    sudo && apt-get install -y \
     git \
     nginx \
     postgresql-client \
     python-psycopg2 \
-    supervisor \
-    yarn
+    supervisor
 
 RUN mkdir /code
 ADD docker /code
@@ -34,13 +33,10 @@ ADD server/pyproject.toml server/poetry.lock /code/server/
 ADD .env /code
 WORKDIR /code/server
 
-
-
 # Install python requirements
 RUN poetry export -f requirements.txt --output /code/server/requirements.txt && pip install -r requirements.txt
 
 EXPOSE 5000
-EXPOSE 3000
 
 ENTRYPOINT ["/bin/bash", "/code/docker/Docker.server/entrypoint.sh"]
 CMD ["development"]
