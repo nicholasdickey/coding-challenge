@@ -9,7 +9,9 @@ import { Game, CardDatum } from 'types'
 
 const TOTAL_CARDS = 52
 const ONE_HAND = 5
-
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 const initGame = () => {
   return {
     cardsLeft: TOTAL_CARDS,
@@ -18,8 +20,8 @@ const initGame = () => {
     board: [] as CardDatum[],
   }
 }
-const deal = ({ cardsLeft, cardsUsed, deck }: Game) => {
-  const board = [] as CardDatum[]
+const deal = ({ cardsLeft, cardsUsed, deck }: Game, board: CardDatum[]) => {
+  const outBoard = [...board]
   let outCardsLeft = cardsLeft
   const outCardsUsed = [...cardsUsed]
   const outDeck = [...deck]
@@ -29,21 +31,33 @@ const deal = ({ cardsLeft, cardsUsed, deck }: Game) => {
     if (typeof nextCard === 'undefined') break
 
     outCardsUsed.push(nextCard)
-    board.push(nextCard)
+    outBoard.push(nextCard)
     outCardsLeft = cardsLeft - 1
     if (outCardsLeft < 0) throw new Error('Unexpected condition -cardsLeft<0')
   }
-  return { cardsLeft: outCardsLeft, cardsUsed: outCardsUsed, deck: outDeck, board }
+  return { cardsLeft: outCardsLeft, cardsUsed: outCardsUsed, deck: outDeck, board: outBoard }
 }
 function App() {
   const [game, setGame] = React.useState(initGame())
-  const doDeal = () => {
-    setGame(deal(game))
+  const doDeal = async () => {
+    let gameUpdate = game
+    let board: CardDatum[] = []
+    setGame({ ...game, ...{ board } })
+    await sleep(50)
+    for (let pass = 1; pass <= ONE_HAND; pass += 1) {
+      gameUpdate = deal(gameUpdate, board)
+      board = gameUpdate.board
+      setGame(gameUpdate)
+      console.info('Inside deal pass', JSON.stringify({ gameUpdate, pass }))
+      // eslint-disable-next-line
+      await sleep(150)
+    }
   }
+
   return (
     <div className="h-screen flex flex-col bg-gray-300">
-      <div className="h-screen bg-gradient-to-b from-card-light via-card-medium to-card-dark">
-        <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md flex items-center space-x-4">
+      <div className="w-auto relative h-full bg-gradient-to-b from-card-light via-card-medium to-card-dark">
+        <div className="absolute p-6 w-auto mx-auto ">
           <button
             type="button"
             onClick={doDeal}
@@ -53,7 +67,7 @@ function App() {
           </button>
         </div>
         {game.board.map((card, i) => {
-          return <Card x={i * 200} y={600} offset={i * 150} value={card} />
+          return <Card key={`${i + 1}:key`} x={0} y={0} position={i} value={card} />
         })}
       </div>
     </div>
