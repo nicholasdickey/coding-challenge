@@ -1,85 +1,14 @@
 import React from 'react'
 import Card from 'Card'
 import { ReactComponent as Winner } from 'assets/winner.svg'
-import shuffle from 'deck'
+import { initGame, deal, reset } from 'deck'
 
 // eslint-disable-next-line
-import { Game, CardDatum, cardLiteralA } from 'types'
+import { cardLiteralA } from 'types'
 
-const TOTAL_CARDS = 52
-const ONE_HAND = 5
-function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-const initGame = comment => {
-  // eslint-disable-next-line
-  console.info('initGame', comment)
-  return {
-    cardsLeft: TOTAL_CARDS,
-    cardsUsed: [] as CardDatum[],
-    deck: shuffle(),
-    board: [] as CardDatum[],
-    ended: false,
-    inflight: false,
-  }
-}
-const deal = ({ cardsLeft, cardsUsed, deck }: Game, board: CardDatum[]) => {
-  console.info('  inside deal', { cardsLeft, board })
-  const outBoard = [...board]
-  let outCardsLeft = cardsLeft
-  const outCardsUsed = [...cardsUsed]
-  const outDeck = [...deck]
-  // for (let i = 0; i < ONE_HAND; i += 1) {
-  const nextCard = outDeck.pop()
-
-  if (typeof nextCard === 'undefined')
-    return { cardsLeft, cardsUsed, deck, board, ended: false, inflight: true }
-
-  outCardsUsed.push(nextCard)
-  outBoard.push(nextCard)
-  outCardsLeft -= 1
-  if (outCardsLeft < 0) throw new Error('Unexpected condition -cardsLeft<0')
-  // }
-  return {
-    cardsLeft: outCardsLeft,
-    cardsUsed: outCardsUsed,
-    deck: outDeck,
-    board: outBoard,
-    ended: false,
-    inflight: true,
-  }
-}
 function App() {
-  const [game, setGame] = React.useState(initGame('default'))
+  const [game, setGame] = React.useState(initGame())
 
-  const reset = () => {
-    setGame(initGame('reset'))
-    // eslint-disable-next-line
-    console.info('reset')
-  }
-
-  const doDeal = async () => {
-    let gameUpdate = game
-    let board: CardDatum[] = []
-    setGame({ ...game, ...{ board, inflight: true } })
-    await sleep(50)
-    console.info('doDeal')
-    for (let pass = 1; pass <= ONE_HAND; pass += 1) {
-      gameUpdate = deal(gameUpdate, board)
-      board = gameUpdate.board
-      setGame(gameUpdate)
-
-      // eslint-disable-next-line
-      await sleep(150)
-      if (pass === ONE_HAND && board.length <= 2) {
-        setGame({ ...gameUpdate, ended: true, inflight: false })
-        console.info('setEnded')
-      } else if (pass === ONE_HAND) {
-        // eslint-disable-next-line
-        setTimeout(() => setGame({ ...gameUpdate, ...{ inflight: false } }), 500)
-      }
-    }
-  }
   const winner =
     game.ended && (game.board[0].card === cardLiteralA || game.board[1].card === cardLiteralA)
       ? true
@@ -108,8 +37,8 @@ function App() {
         </div>
         {winner ? (
           <div className="absolute top-18 flex items-start justify-start w-full h-40">
-            <div className=" mx-auto ">
-              <Winner />
+            <div className=" mx-auto">
+              <Winner className="w-full px-4" />
             </div>
           </div>
         ) : null}
@@ -121,14 +50,14 @@ function App() {
         >
           <div className="m-auto w-full flex items-center justify-center z-20">
             {game.ended ? (
-              <div>
-                <div className="font-rock text-white  text-5xl">
-                  {winner ? <div>Gret job! You won the game!</div> : <div>You Lose, Sucker!</div>}
+              <div className="w-full">
+                <div className="w-full font-rock text-white  text-2xl lg:text-5xl w-full text-center px-4">
+                  {winner ? <div>Great job! You won the game!</div> : <div>You Lose, Sucker!</div>}
                 </div>
                 <div className="w-full flex items-center justify-center m-auto pt-6">
                   <button
                     type="button"
-                    onClick={reset}
+                    onClick={() => reset(setGame)}
                     className="m-auto w-1/8 p-2 opacity-80 hover:bg-blue-800 py-1 px-4 border border-yellow-400 rounded "
                   >
                     <div className="font-rock text-yellow-400 text-lg">Play Again</div>
@@ -138,7 +67,7 @@ function App() {
             ) : (
               <button
                 type="button"
-                onClick={doDeal}
+                onClick={() => deal(game, setGame)}
                 disabled={game.inflight}
                 className={`"m-auto w-1/8 p-6 h-18  bg-yellow-400 opacity-80  hover:bg-blue-800 py-1 px-2 border border-black rounded"`}
               >
@@ -152,7 +81,7 @@ function App() {
             <div className=" h-full flex items-end justify-end mb-0 pb-0 mr-12">
               <button
                 type="button"
-                onClick={reset}
+                onClick={() => reset(setGame)}
                 className="w-1/8 h-20 mb-2 py-1  opacity-80 hover:bg-blue-800  px-2 border border-yellow-400 rounded "
               >
                 <div className="font-rock text-yellow-400 text-lg">Reset</div>

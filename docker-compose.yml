@@ -15,8 +15,8 @@ services:
     volumes:
       - .:/code
     ports:
-      - '5000:5000'
-      - '3000:3000'
+      - '5000:5011'
+      - '3000:3011'
     depends_on:
       - db
     links:

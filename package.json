@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "proxy": "http://localhost:5000",
   "license": "UNLICENSED",
+  "homepage":"dev.kingstonrivers.com",
   "scripts": {
     "start": "npm-run-all -p start:js start:server",
     "start:js": "craco start",
