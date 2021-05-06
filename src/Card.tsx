@@ -20,11 +20,13 @@ const destinations = [
 ]
 export default function Card({ x, y, position, value, key }: CardParams) {
   console.info(
-    `position ${JSON.stringify({ x, y, position, rotate: destinations[position].rotation })}`
+    `position ${JSON.stringify({
+      x,
+      y,
+      position,
+      rotate: destinations[position].rotation,
+    })}`
   )
-  const vw = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth // Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-
-  // eslint-disable-next-line
 
   return (
     <Motion
@@ -35,14 +37,14 @@ export default function Card({ x, y, position, value, key }: CardParams) {
         rotate: 0,
       }}
       style={{
-        left: spring(x + 12.5 + position * 15),
-        bottom: spring(y + destinations[position].inset),
+        left: spring(x + 14 + position * 15),
+        bottom: spring(y + 200 + destinations[position].inset),
         rotate: spring(destinations[position].rotation),
       }}
     >
       {interpolatedStyle => (
         <div
-          className="absolute h-16 md:h-22 lg:h-28 xl:h-32 w-12 rounded-lg bg-white shadow-2xl "
+          className="absolute h-12 md:h-16 lg:h-22 xl:h-28 2xl:h-32 w-12 rounded-lg bg-white shadow-2xl "
           style={{
             // height: '28%',
             // width: '12%',
