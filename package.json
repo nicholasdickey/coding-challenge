@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "hudsonwide/coding-challenge",
+  "name": "challenge",
   "version": "0.1.0",
   "proxy": "http://localhost:5000",
   "license": "UNLICENSED",

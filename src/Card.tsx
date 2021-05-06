@@ -1,4 +1,5 @@
-import React from 'react'
+// eslint-disable-next-line
+import React, { ReactElement } from 'react'
 import { Motion, spring } from 'react-motion'
 
 import { ReactComponent as Club } from 'assets/Clover.svg'
@@ -32,7 +33,7 @@ export default function Card({ x, y, position, value, key }: CardParams) {
       rotate: destinations[position].rotation,
     })}`
   ) */
-  let suit: any
+  let suit: ReactElement
 
   switch (value.suit) {
     case 'clubs':
