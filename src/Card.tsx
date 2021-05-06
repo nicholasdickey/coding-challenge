@@ -5,8 +5,8 @@ import { ReactComponent as Club } from 'assets/Clover.svg'
 import { ReactComponent as Diamond } from 'assets/Diamond.svg'
 import { ReactComponent as Heart } from 'assets/Heart.svg'
 import { ReactComponent as Spade } from 'assets/Spade.svg'
-
-import { CardDatum, Suits } from 'types'
+// eslint-disable-next-line
+import { CardDatum } from 'types'
 
 // eslint-disable-next-line
 type CardParams = {

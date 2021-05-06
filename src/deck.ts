@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import { CardDatum, Suits } from 'types'
 
 const ACE = 1
