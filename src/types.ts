@@ -5,4 +5,9 @@ export type Game = {
   cardsUsed: CardDatum[]
   deck: CardDatum[]
   board: CardDatum[]
+  ended: boolean
 }
+export const cardLiteralA = 'A'
+export const cardLiteralJ = 'J'
+export const cardLiteralQ = 'Q'
+export const cardLiteralK = 'K'

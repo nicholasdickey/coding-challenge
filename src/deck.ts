@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import { CardDatum, Suits } from 'types'
+import { CardDatum, Suits, cardLiteralA, cardLiteralJ, cardLiteralQ, cardLiteralK } from 'types'
 
 const ACE = 1
 const JOHN = 11
@@ -31,21 +31,21 @@ export default function init(): CardDatum[] {
       let cardString
       switch (card) {
         case ACE:
-          cardString = 'A'
+          cardString = cardLiteralA
           break
         case JOHN:
-          cardString = 'J'
+          cardString = cardLiteralJ
           break
         case QUEEN:
-          cardString = 'Q'
+          cardString = cardLiteralQ
           break
         case KING:
-          cardString = 'K'
+          cardString = cardLiteralK
           break
         default:
           cardString = `${card}`
       }
-      console.info('generating card', { suit, cardString })
+      //  console.info('generating card', { suit, cardString })
       deck.push({
         suit,
         card: cardString,
