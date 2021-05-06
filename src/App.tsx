@@ -11,7 +11,7 @@ const ONE_HAND = 5
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
-const initGame = (comment: string) => {
+const initGame = comment => {
   // eslint-disable-next-line
   console.info('initGame', comment)
   return {
