@@ -9,14 +9,14 @@ services:
     build:
       context: .
       dockerfile: ./docker/Docker.server/Dockerfile
-    image: code-challenge
+    image: code-challenge-frontend
     env_file: .env
-    container_name: code-challenge
+    container_name: code-challenge-frontend
     volumes:
       - .:/code
     ports:
-      - '5000:5011'
-      - '3000:3011'
+      - '5011:5000'
+      - '3011:3000'
     depends_on:
       - db
     links:

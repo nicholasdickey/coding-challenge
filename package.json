@@ -4,10 +4,10 @@
   "version": "0.1.0",
   "proxy": "http://localhost:5000",
   "license": "UNLICENSED",
-  "homepage":"dev.kingstonrivers.com",
+  "homepage": "dev.kingstonrivers.com",
   "scripts": {
     "start": "npm-run-all -p start:js start:server",
-    "start:js": "craco start",
+    "start:js": "DANGEROUSLY_DISABLE_HOST_CHECK=true craco start",
     "jest": "craco test --env=jsdom",
     "build": "craco build",
     "analyze": "source-map-explorer 'build/static/js/*.js' --html > report.html",

@@ -8,6 +8,9 @@ This repository contains the coding "challenge", if you can call it that.
 
 ## Frontend challenge
 
+Here is a live demo of the finished challenge: http://frontend-challenge.kingstonrivers.com/
+Here is a brief video of the demo: https://drive.google.com/file/d/166Tl3sve3LuRmkZJ0Gzsedg2UdwRkSNZ/view
+
 The task is to build a simple card game. See [design folder](./design) or [Sketch Cloud](https://www.sketch.com/s/40cd1ec0-8487-4053-a6ea-5d9a70076ebb) for what it should look like. It doesn't have to be pixel perfect, but it should look nice.
 
 The program should perform the following functions.
