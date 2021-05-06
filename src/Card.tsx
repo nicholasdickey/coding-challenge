@@ -16,6 +16,7 @@ type CardParams = {
   position: number
   value: CardDatum
   key: string
+  ended: boolean
 }
 const destinations = [
   { inset: 20, rotation: 10 },
@@ -24,15 +25,11 @@ const destinations = [
   { inset: 17, rotation: -5 },
   { inset: 20, rotation: -10 },
 ]
-export default function Card({ x, y, position, value, key }: CardParams) {
-  /* console.info(
-    `position ${JSON.stringify({
-      x,
-      y,
-      position,
-      rotate: destinations[position].rotation,
-    })}`
-  ) */
+const endDestinations = [
+  { inset: 15, rotation: 5 },
+  { inset: 15, rotation: -5 },
+]
+export default function Card({ x, y, position, value, key, ended }: CardParams) {
   let suit: ReactElement
 
   switch (value.suit) {
@@ -54,15 +51,16 @@ export default function Card({ x, y, position, value, key }: CardParams) {
    * Short answer: the combination of Create React App and TailwindCSS as a hard requirement for the project.
    *
    * Longer answer: I need pixel perfect positioning for the card movement animation and it is only available with TailwindCSS 2.1 which does not have the postCSS 7 compatibility implementation.
-   * Unfortunately Create React App does not support postCSS 8 at the moment. So have to resort to using React style attribute, which severely limits the responsive quality of the positioning of the cards.
+   * Unfortunately, Create React App does not support postCSS 8 at the moment. So I had to resort to using React style attribute which limits the responsive quality of the positioning of the cards.
    * I could have added Styled-Components to the project but that would be an overkill for a simple test task and would negate the whole rational for using TailwindCSS in the first place.
    *
-   * Of course, given my drathers, I would use Next.js and Styled-components to begin with, and the implementation would have been 100% responsive. As is, the app stays fully responsive to the minimum height of 540 and then gracefully degrades (vertical supported is 480px which should be sufficient for phones.
-   *
+   * Of course, given my drathers, I would use Next.js and Styled-components to begin with, and the implementation would have been 100% responsive.
+   * As is, the app stays fully responsive to the minimum height of 600 which should be sufficient for phone screens. Beyond that a vscroll bar pops up.
    * Nick
    *
    *
    */
+  console.info('card ', position, ended)
   return (
     <Motion
       key={key}
@@ -72,9 +70,13 @@ export default function Card({ x, y, position, value, key }: CardParams) {
         rotate: 0,
       }}
       style={{
-        left: spring(x + 14 + position * 15),
-        bottom: spring(y + 28 + destinations[position].inset),
-        rotate: spring(destinations[position].rotation),
+        left: spring(ended ? x + 36 + position * 15 : x + 14 + position * 15),
+        bottom: spring(
+          y + 28 + (ended ? endDestinations[position].inset : destinations[position].inset)
+        ),
+        rotate: spring(
+          ended ? endDestinations[position].rotation : destinations[position].rotation
+        ),
       }}
     >
       {interpolatedStyle => (
@@ -88,7 +90,7 @@ export default function Card({ x, y, position, value, key }: CardParams) {
         >
           <div className="relative h-full w-full">
             <div className="absolute w-full flex flex-col items-start justify-begin p-4">
-              <div className="  font-rock top-0  2xl:top-6 left-6 text-2xl md:text-4xl lg:left-4 lg:text-5xl xl:text-6xl ">
+              <div className=" font-rock top-0  2xl:top-6 left-6 text-xl sm:text-2xl md:text-4xl lg:left-4 lg:text-5xl xl:text-6xl ">
                 {value.card}
               </div>
               <div className="relative flex ml-4 w-20">{suit}</div>

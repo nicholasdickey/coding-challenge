@@ -6,6 +6,7 @@ export type Game = {
   deck: CardDatum[]
   board: CardDatum[]
   ended: boolean
+  inflight: boolean
 }
 export const cardLiteralA = 'A'
 export const cardLiteralJ = 'J'

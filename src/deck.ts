@@ -45,14 +45,13 @@ export default function init(): CardDatum[] {
         default:
           cardString = `${card}`
       }
-      //  console.info('generating card', { suit, cardString })
       deck.push({
         suit,
         card: cardString,
       })
     }
   })
-  console.info('deck created', deck)
+
   for (let i = 0; i < NUM_SHUFFLES; i += 1) deck = shuffle(deck)
   return deck
 }
