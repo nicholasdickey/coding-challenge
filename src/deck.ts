@@ -1,6 +1,8 @@
 import { CardDatum, Suits } from 'types'
 
 const ACE = 1
+const JOHN = 11
+const QUEEN = 12
 const KING = 13
 const NUM_SHUFFLES = 50
 
@@ -25,8 +27,28 @@ export default function init(): CardDatum[] {
   const suits: Suits[] = ['hearts', 'diamonds', 'clubs', 'spades']
   suits.forEach(suit => {
     for (let card = ACE; card <= KING; card += 1) {
-      console.info('generating card', { suit, card })
-      deck.push({ suit, card })
+      let cardString
+      switch (card) {
+        case ACE:
+          cardString = 'A'
+          break
+        case JOHN:
+          cardString = 'J'
+          break
+        case QUEEN:
+          cardString = 'Q'
+          break
+        case KING:
+          cardString = 'K'
+          break
+        default:
+          cardString = `${card}`
+      }
+      console.info('generating card', { suit, cardString })
+      deck.push({
+        suit,
+        card: cardString,
+      })
     }
   })
   console.info('deck created', deck)

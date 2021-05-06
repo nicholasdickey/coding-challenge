@@ -81,18 +81,14 @@ module.exports = {
     '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'no-public' }],
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/member-delimiter-style': 0,
+    '@typescript-eslint/no-nested-ternary': 0,
   },
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
       rules: {
         'react/prop-types': 0,
-      },
-    },
-    {
-      files: ['*.test.ts', '*.test.tsx', '*.stories.ts', '*.stories.tsx'],
-      rules: {
-        '@typescript-eslint/ban-ts-ignore': 0,
+        '@typescript-eslint/no-nested-ternary': 0,
       },
     },
     {
@@ -100,6 +96,12 @@ module.exports = {
       rules: {
         '@typescript-eslint/recommended': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
+      },
+    },
+    {
+      files: ['*.test.ts', '*.test.tsx', '*.stories.ts', '*.stories.tsx'],
+      rules: {
+        '@typescript-eslint/ban-ts-ignore': 0,
       },
     },
   ],
