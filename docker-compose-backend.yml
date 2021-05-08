@@ -1,0 +1,25 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    container_name: code-challenge-db
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+
+  challenge-backend:
+    build:
+      context: .
+      dockerfile: ./docker/Docker.server/backend.Dockerfile
+    image: 'hudsonwilde/ccb'
+    working_dir: /home/app
+    env_file: .env
+    #container_name: challenge-fe
+    volumes:
+      - homeapp:/home/app
+    ports:
+      - '3011:3000'
+    stdin_open: true
+
+volumes:
+  homeapp:
+    driver: local

@@ -18,4 +18,4 @@ COPY . .
 #RUN git clone https://github.com/nicholasdickey/coding-challenge.git
 #RUN yarn
 
-ENTRYPOINT /bin/bash
+CMD ["yarn","start:js"]

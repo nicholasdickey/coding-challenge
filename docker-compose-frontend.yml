@@ -1,0 +1,19 @@
+version: '3.2'
+services:
+  challenge-front:
+    build:
+      context: .
+      dockerfile: ./docker/Docker.server/frontend.Dockerfile
+    image: 'hudsonwilde/ccf'
+    working_dir: /home/app
+    env_file: .env
+    #container_name: challenge-fe
+    volumes:
+      - homeapp:/home/app
+    ports:
+      - '3011:3000'
+    stdin_open: true
+
+volumes:
+    homeapp:
+        driver: local

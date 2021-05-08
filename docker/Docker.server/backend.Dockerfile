@@ -7,7 +7,7 @@ FROM nikolaik/python-nodejs:python3.9-nodejs12
 WORKDIR /home/app
 COPY package.json package.json
 RUN yarn
-COPY . .
+#COPY . .
 #RUN apt-get update --fix-missing && \
 #  apt-get -y --force-yes install emacs git
 #ADD .env /home/app

@@ -29,9 +29,9 @@ function supervisor {
 }
 
 function development {
-    migrate
-    mockdata
-    assets
+   # migrate
+   # mockdata
+   # assets
     supervisor
 }
 

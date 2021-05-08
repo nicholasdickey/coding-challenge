@@ -16,20 +16,34 @@ fi
 source .env
 
 case $task in
-    build)
+    build:frontend)
         # Build docker containers. Pass --no-cache to force re-downloading of images.
         # See build --help for additional info
-        docker-compose build $args
+        docker-compose -f docker-compose-frontend.yml build $args
         ;;
-    start)
+     build:backend)
+        # Build docker containers. Pass --no-cache to force re-downloading of images.
+        # See build --help for additional info
+        docker-compose -f docker-compose-backend.yml build $args
+        ;;    
+    start:frontend)
         # Start docker containers.
         # See up --help for additional info
-        docker-compose up $args
+        docker-compose -f docker-compose-frontend.yml up $args
         ;;
-    stop)
+    start:backend)
+        # Start docker containers.
+        # See up --help for additional info
+        docker-compose -f docker-compose-backend.yml up $args
+        ;;    
+    stop:frontend)
         # Stop docker containers.
-        docker-compose stop
+        docker-compose -f docker-compose-frontend.yml stop
         ;;
+    stop:backend)
+        # Stop docker containers.
+        docker-compose -f docker-compose-backend.yml stop
+        ;;    
     clean)
         # Remove docker containers (if they exist)
         # Run this with --rmi all to remove the mysql image too
