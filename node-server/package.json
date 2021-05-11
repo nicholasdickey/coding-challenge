@@ -8,16 +8,21 @@
   "private": true,
   "dependencies": {
     "apollo-server-express": "^2.22.2",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-session": "^1.17.1",
     "graphql": "^15.5.0",
+    "pg": "^8.6.0",
+    "pgtools": "^0.3.1",
     "typescript": "^4.2.3",
     "uuid": "^8.3.2"
   },
   "scripts": {
     "gql-codegen": "graphql-codegen --config codegen.yml",
-    "start": "ts-node index.ts",
+    "createDB": "node create_db.js",
+    "start": "ts-node -O '{\"module\":\"commonjs\"}' index.ts",
     "test": "npm-run-all eslint prettier:check jest",
-    "jest": "jest",
+    "jest": "jest --detectOpenHandles ",
     "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "prettier:write": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
     "prettier:check": "prettier --list-different \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\""
@@ -29,6 +34,7 @@
     "@graphql-codegen/typescript-resolvers": "1.19.0",
     "@types/jest": "^25",
     "@types/node": "^12",
+    "@types/pg": "^7.14.11",
     "@typescript-eslint/eslint-plugin": "^2",
     "@typescript-eslint/parser": "^2",
     "eslint": "^6",
