@@ -10,6 +10,7 @@ on:
 
 env:
   EXTEND_ESLINT: true
+  GITHUB: 1
 
 jobs:
   deps-and-codegen:
@@ -37,7 +38,6 @@ jobs:
 
       - name: GQL Codegen
         run: cd node-server && yarn run gql-codegen
-
       - uses: actions/upload-artifact@v2-preview
         with:
           name: generated
@@ -46,6 +46,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: deps-and-codegen
+    services:
+      db:
+        image: postgres
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 30s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js
@@ -64,6 +77,9 @@ jobs:
         with:
           path: node-server/node_modules
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('node-server/yarn.lock') }}
+      - name: Create Test Database
+        run: cd node-server && yarn run createDB
+
       - run: cd node-server && yarn jest
 
   eslint:
