@@ -2,7 +2,7 @@ name: backend-node
 
 on:
   push:
-    branches: [master]
+    branches: [backend-nick]
   pull_request:
     branches: [master]
     paths:
@@ -21,7 +21,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Cache node_modules
         uses: actions/cache@main
         id: cache-node-server
@@ -41,7 +41,7 @@ jobs:
       - uses: actions/upload-artifact@v2-preview
         with:
           name: generated
-          path: "./node-server/graphql-types.ts*"
+          path: './node-server/graphql-types.ts*'
 
   test:
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Download GQL codegen
         uses: actions/download-artifact@v2-preview
         with:
@@ -74,7 +74,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Restore dependencies
         uses: actions/cache@main
         env:
@@ -97,7 +97,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Restore dependencies
         uses: actions/cache@main
         env:
@@ -116,7 +116,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Restore dependencies
         uses: actions/cache@main
         env:
