@@ -1,3 +1,4 @@
+import { forEach } from 'lodash'
 import { Pool, QueryResult } from 'pg'
 
 export enum CollectionType {
@@ -70,7 +71,21 @@ export async function lazyInitSchema() {
     throw error
   }
 }
-
+export async function resetSession(sessionID: string): Promise<void> {
+  try {
+    const gamesResult = await query('SELECT game_id from node_games where session_id=$1', [
+      sessionID,
+    ])
+    const games = gamesResult.rows
+    games.forEach(
+      async ({ game_id }) => await query('DELETE from node_cards where game_id=$1', [game_id])
+    )
+    await query('DELETE FROM node_games where session_id=$1', [sessionID])
+  } catch (error) {
+    console.error('Caught exception in resetSession:', error)
+    throw error
+  }
+}
 async function getCards(gameId: number, collectionType: CollectionType): Promise<Card[]> {
   try {
     const cardsResult = await query(

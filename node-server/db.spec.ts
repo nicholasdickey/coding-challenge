@@ -1,4 +1,4 @@
-import { startGame, getGame, updateGame, getStreak, dropSchema, Game } from './db'
+import { startGame, getGame, updateGame, getStreak, dropSchema, resetSession, Game } from './db'
 import { shuffle, dealOne } from './test.fixings'
 
 const SESSION_ID = 'test-session-ID'
@@ -9,9 +9,14 @@ describe('Test db layer', function() {
   // eslint-disable-next-line
   it('Start Game, store and read back', async () => {
     // await lazyInitSchema()
+    /* 
+    This can't be used for the routine CI regression testing for obvious reasons
     await dropSchema()
-
+    
+    */
     //    console.log('after drop schema')
+    await resetSession(SESSION_ID)
+
     try {
       const noGame = await getGame(SESSION_ID, 1)
       console.info('noGame:', noGame)
