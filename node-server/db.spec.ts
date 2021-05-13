@@ -1,4 +1,14 @@
-import { startGame, getGame, updateGame, getStreak, dropSchema, resetSession, Game } from './db'
+import {
+  startGame,
+  getGame,
+  updateGame,
+  getStreak,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  dropSchema,
+  resetSession,
+  Game,
+  Streak,
+} from './db'
 import { shuffle, dealOne } from './test.fixings'
 
 const SESSION_ID = 'test-session-ID'
@@ -46,6 +56,7 @@ describe('Test db layer', function() {
     expect(updatedGame).toEqual(modifiedGame)
   })
   it('Test streak', async () => {
+    await resetSession(SESSION_ID)
     const lostGames: Game[] = []
     for (let i = 0; i < 5; i++) {
       // eslint-disable-next-line
@@ -53,7 +64,7 @@ describe('Test db layer', function() {
       // eslint-disable-next-line
       lostGames[i] = await getGame(SESSION_ID, gid)
     }
-    const streak: { winner: boolean; streak: number } = await getStreak(SESSION_ID)
+    const streak: Streak = await getStreak(SESSION_ID)
     expect(streak).toEqual({
       winner: false,
       streak: 5,

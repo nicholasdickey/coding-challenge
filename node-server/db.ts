@@ -14,6 +14,10 @@ export type Game = {
   board: Card[]
   cardsUsed: Card[]
 }
+export type Streak = {
+  winner: boolean
+  streak: number
+}
 const pool: Pool = new Pool({
   user: 'postgres',
   host: process.env.GITHUB === '1' ? 'localhost' : 'db',
@@ -70,20 +74,21 @@ export async function lazyInitSchema() {
     throw error
   }
 }
-export async function resetSession(sessionID: string): Promise<void> {
+export async function resetSession(sessionID: string): Promise<boolean> {
   try {
     const gamesResult = await query('SELECT game_id from node_games where session_id=$1', [
       sessionID,
     ])
     const games = gamesResult.rows
-    games.forEach(
-      async ({ game_id }) => await query('DELETE from node_cards where game_id=$1', [game_id])
+    games.forEach(async ({ game_id }) =>
+      query('DELETE from node_cards where game_id=$1', [game_id])
     )
     await query('DELETE FROM node_games where session_id=$1', [sessionID])
   } catch (error) {
     console.error('Caught exception in resetSession:', error)
     throw error
   }
+  return true
 }
 async function getCards(gameId: number, collectionType: CollectionType): Promise<Card[]> {
   try {
@@ -213,14 +218,17 @@ export async function getStreak(
     let currentWinner = winner
     streak = 0
     while (winner === currentWinner) {
+      streak += 1
       // eslint-disable-next-line no-await-in-loop
       currentWinner = await singleGame(ordinal++)
-      if (typeof currentWinner !== 'undefined') {
-        streak += 1
+
+      if (typeof currentWinner === 'undefined') {
+        break
         // console.info('singleGame after next game', { currentWinner, ordinal, streak })
       }
     }
 
+    console.info('db:getStreak', { sessionID, winner, streak })
     return { winner, streak }
   } catch (error) {
     console.error('Caught exception in getStreak:', error)
