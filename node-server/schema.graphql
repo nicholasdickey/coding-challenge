@@ -1,23 +1,39 @@
+enum Suit {
+  hearts
+  diamonds
+  clubs
+  spades
+}
+type Card {
+  value: Int!
+  suit: Int!
+}
 type Game {
   id: ID!
+  deck: [Card]
+  board: [Card]
+  cardsUsed: [Card]
+  winner: Boolean
+  ended: Boolean
 }
-
-type DealResult {
+type GameResult {
   success: Boolean!
   game: Game
+  msg: String
 }
-
-
-type User {
-  id: ID!
-  username: String
-  games: [Game!]
+type StreakResult {
+  winner: Boolean!
+  streak: Int!
+}
+input GameId {
+  gameId: Int!
 }
 
 type Query {
-  me: User
+  streaks: StreakResult
 }
 
 type Mutation {
-  deal: DealResult
+  shuffle: GameResult
+  deal(gameId: GameId): GameResult
 }
