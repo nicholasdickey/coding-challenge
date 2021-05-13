@@ -1,4 +1,3 @@
-import { forEach } from 'lodash'
 import { Pool, QueryResult } from 'pg'
 
 export enum CollectionType {
