@@ -1,12 +1,6 @@
-import { sampleUser } from './data'
+import './graphql-types.ts'
 
 export const resolvers = {
-  Query: {
-    me: () => sampleUser,
-  },
-  Mutation: {
-    deal: () => {
-      return { success: false }
-    },
-  },
+  Query: {},
+  Mutation: {},
 }
