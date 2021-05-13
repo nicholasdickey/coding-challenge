@@ -2,7 +2,7 @@ name: backend-node
 
 on:
   push:
-    branches: [backend-nick]
+    branches: [backend]
   pull_request:
     branches: [master]
     paths:
