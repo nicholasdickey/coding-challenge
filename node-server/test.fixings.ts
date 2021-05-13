@@ -39,7 +39,7 @@ export function shuffle(): Card[] {
   const deck: Card[] = []
   const suits: Suits[] = [Suits.hearts, Suits.diamonds, Suits.clubs, Suits.spades]
   suits.forEach(suit => {
-    for (let card = ACE; card <= 3; card += 1) {
+    for (let card = ACE; card <= KING; card += 1) {
       deck.push({
         suit,
         value: card,

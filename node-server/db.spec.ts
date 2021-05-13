@@ -8,7 +8,6 @@ describe('Test db layer', function() {
   let gameId: number
   // eslint-disable-next-line
   it('Start Game, store and read back', async () => {
-    console.log('starting db test')
     // await lazyInitSchema()
     await dropSchema()
 
@@ -26,7 +25,7 @@ describe('Test db layer', function() {
     game = await getGame(SESSION_ID, gameId)
     console.info('game', game)
     expect({
-      gameId: gameId,
+      gameId,
       board: [],
       cardsUsed: [],
       ended: false,
@@ -46,6 +45,7 @@ describe('Test db layer', function() {
     for (let i = 0; i < 5; i++) {
       // eslint-disable-next-line
       let gid = await startGame(SESSION_ID, shuffle())
+      // eslint-disable-next-line
       lostGames[i] = await getGame(SESSION_ID, gid)
     }
     const streak: { winner: boolean; streak: number } = await getStreak(SESSION_ID)

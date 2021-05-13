@@ -16,7 +16,7 @@ export type Game = {
 }
 const pool: Pool = new Pool({
   user: 'postgres',
-  host: 'db',
+  host: process.env.GITHUB === '1' ? 'localhost' : 'db',
   database: 'uplifty',
   port: 5432,
 })
@@ -51,10 +51,12 @@ export async function lazyInitSchema() {
     ])
     if (schemaResponse.rows?.length < 2) {
       // console.info('schema is missing')
+      // eslint-disable-next-line
       let createResult = await query(
         'CREATE TABLE IF NOT EXISTS node_games (game_id SERIAL PRIMARY KEY,session_id VARCHAR(126),ended BOOLEAN ,time_started TIMESTAMP,time_ended TIMESTAMP,winner BOOLEAN)'
       )
       // console.info('table node_games create result', JSON.stringify(createResult))
+      // eslint-disable-next-line
       createResult = await query(
         `CREATE TABLE IF NOT EXISTS node_cards (card_id SERIAL PRIMARY KEY ,game_id INT, collection_type INT, ordinal INT, value INT, suit INT);`
       )
@@ -95,6 +97,7 @@ async function updateCards(gameId: number, collectionType: CollectionType, cards
         )
       )
     }
+    // eslint-disable-next-line
     const cardsResult = await Promise.all(inserts)
   } catch (error) {
     console.error('Caught exception in updateCards:', error)
@@ -198,7 +201,7 @@ export async function getStreak(
     while (winner === currentWinner) {
       // eslint-disable-next-line no-await-in-loop
       currentWinner = await singleGame(ordinal++)
-      if (typeof currentWinner != 'undefined') {
+      if (typeof currentWinner !== 'undefined') {
         streak += 1
         // console.info('singleGame after next game', { currentWinner, ordinal, streak })
       }

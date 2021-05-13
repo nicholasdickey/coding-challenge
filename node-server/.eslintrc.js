@@ -18,6 +18,7 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   rules: {
+    'no-plusplus': 0,
     'no-console': ['error', { allow: ['info', 'warn', 'error'] }],
     'no-underscore-dangle': ['error', { allow: ['__typename'] }],
     'class-methods-use-this': 0,
@@ -73,15 +74,24 @@ module.exports = {
     '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'no-public' }],
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/member-delimiter-style': 0,
+    '@typescript-eslint/no-explicit-any': 0,
   },
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
     },
     {
-      files: ['*.test.ts', '*.test.tsx', '*.stories.ts', '*.stories.tsx'],
+      files: ['*.test.ts', '*.test.tsx', '*.stories.ts', '*.stories.tsx', 'create_db.ts'],
       rules: {
         '@typescript-eslint/ban-ts-ignore': 0,
+      },
+    },
+    {
+      files: ['*.js'],
+      rules: {
+        'global-require': 0,
+        'no-var': 0,
+        '@typescript-eslint/no-var-requires': 0,
       },
     },
   ],
