@@ -1,34 +1,233 @@
 import fs from 'fs'
 import { graphql } from 'graphql'
 import { makeExecutableSchema } from 'graphql-tools'
+import { Card } from './graphql-types'
 import { resolvers } from './resolvers'
 
-const ME_QUERY = {
-  id: 'Query for sample user',
-  query: `
-      query {
-        me {
-           id
-           username
+const RESET_MUTATION = (sessionID: string) => {
+  return {
+    id: 'Mutation to reset the session - delete all the games and associated card collections',
+    query: `
+      mutation {
+        resetSession(sessionID:"${sessionID}") {
+            success
         }
       }
     `,
-
-  // expected result
-  expected: { data: { me: { id: 'User:1', username: 'interview' } } },
+  }
 }
+const SHUFFLE_MUTATION = (sessionID: string) => {
+  return {
+    id: 'Mutation to get a new game with a freshly shuffled deck',
+    query: `
+      mutation {
+        shuffle(sessionID:"${sessionID}") {
+            success
+            game{
+                gameId
+                deck {
+                    value
+                    suit
+                }
+                board {
+                    value
+                    suit
+                }
+                cardsUsed {
+                    value
+                    suit
+                }
+                ended
+           }
+        }
+      }
+    `,
+  }
+}
+const DEAL_MUTATION = (sessionID: string, gameId: number) => {
+  return {
+    id: 'Mutation to get a top the five cards from existing game/deck',
+    query: `
+      mutation {
+        deal(sessionID:"${sessionID}", gameId:${gameId}) {
+            success
+            game{
+                gameId
+                deck {
+                    value
+                    suit
+                }
+                board {
+                    value
+                    suit
+                }
+                cardsUsed {
+                    value
+                    suit
+                }
+                ended
+                winner
+           }
+        }
+      }
+    `,
+  }
+}
+const STREAK_QUERY = (sessionID: string) => {
+  return {
+    id: 'Query to get a winning/losing streak fro the session',
+    query: `
+      query {
+        getStreak(sessionID:"${sessionID}") {
+            success
+            streak{
+                winner
+                length
+            }
+        }
+      }
+    `,
+  }
+}
+// eslint-disable-next-line
 
-describe('Resolvers > Me', () => {
-  const typeDefs = fs.readFileSync('./schema.graphql', 'utf8')
-  const schema = makeExecutableSchema({ typeDefs, resolvers })
-
+const typeDefs = fs.readFileSync('./schema.graphql', 'utf8')
+const schema = makeExecutableSchema({ typeDefs, resolvers })
+const winners: boolean[] = []
+describe(`GQL Test`, () => {
   // running the test for each case in the cases array
-  /* const { id, query, expected } = ME_QUERY
+  const { query: resetQuery } = RESET_MUTATION('gql-test-session')
+  const { id: shuffleId, query: shuffleQuery } = SHUFFLE_MUTATION('gql-test-session')
+  it(`query: ${shuffleId}`, async () => {
+    const resetResult = await graphql(schema, resetQuery)
+    expect(resetResult.data?.resetSession?.success).toEqual(true)
+    const resultWrap = await graphql(schema, shuffleQuery)
+    // console.info('graphql result', JSON.stringify(resultWrap))
+    const result = resultWrap?.data?.shuffle
 
-  test(`query: ${id}`, async () => {
-    const result = await graphql(schema, query)
-    return expect(result).toEqual(expected)
+    console.info(
+      JSON.stringify(
+        {
+          result: {
+            success: result.success,
+            deckLength: result.game?.deck?.length,
+            boardLength: result.game?.board?.length || 0,
+            cardsUsedLength: result.game?.cardsUsed?.length,
+          },
+        },
+        null,
+        4
+      )
+    )
+    return expect({
+      success: result.success,
+      deckLength: result.game?.deck?.length,
+      boardLength: result.game?.board?.length || 0,
+      cardsUsedLength: result.game?.cardsUsed?.length,
+    }).toEqual({
+      success: true,
+      deckLength: 52,
+      boardLength: 0,
+      cardsUsedLength: 0,
+    })
   })
-  */
-  it('placeholder', async () => expect('good').toEqual('good'))
+  it(`Test deal`, async () => {
+    // describe(`Deal`, async () => {
+
+    await graphql(schema, resetQuery)
+
+    for (let gameIndex = 0; gameIndex < 2; gameIndex += 1) {
+      let ended = false
+      let firstRun = true
+
+      // eslint-disable-next-line no-await-in-loop
+      const shuffleResultWrap = await graphql(schema, shuffleQuery)
+      const gameId = shuffleResultWrap?.data?.shuffle?.game?.gameId
+      const { id: dealId, query: dealQuery } = DEAL_MUTATION('gql-test-session', gameId)
+      console.info(JSON.stringify({ dealId, dealQuery }, null, 4))
+      while (!ended) {
+        // eslint-disable-next-line no-await-in-loop
+        const resultWrap = await graphql(schema, dealQuery)
+        // console.info(JSON.stringify({ resultWrap }, null, 4))
+        const result = resultWrap?.data?.deal
+        // console.info(JSON.stringify({ result }, null, 4))
+        if (firstRun) {
+          // eslint-disable-next-line no-constant-condition
+          firstRun = false
+          if (gameIndex === 0) {
+            // run jest test only once
+
+            expect({
+              success: result?.success,
+              deckLength: result?.game?.deck?.length,
+              boardLength: result?.game?.board?.length || 0,
+              cardsUsedLength: result?.game?.cardsUsed?.length,
+              ended: result?.game?.ended,
+              winner: result?.game?.winner,
+            }).toEqual({
+              success: true,
+              deckLength: 47,
+              boardLength: 5,
+              cardsUsedLength: 5,
+              ended: false,
+              winner: false,
+            })
+          }
+        }
+        ended = result.game?.ended as boolean
+        if (ended) {
+          // console.info('pushing winner:', result.game?.winner)
+          winners.push(result.game?.winner as boolean)
+          if (gameIndex === 0) {
+            const board: Card[] = result.game?.board as Card[]
+            console.info('gameIndex=0', JSON.stringify({ board }))
+            const card1 = board[0]
+            const card2 = board[1]
+            const winner: boolean = result.game?.winner as boolean
+            console.info(
+              'cards',
+              JSON.stringify({
+                card1,
+                card2,
+              })
+            )
+            console.info(
+              'values',
+              JSON.stringify({
+                winner,
+                value1: card1.value,
+                value2: card2.value,
+              })
+            )
+
+            expect(winner).toEqual(card1.value === 1 || card2.value === 1)
+          }
+        }
+      }
+    }
+  }, 10000)
+
+  it(`Testing getStreak, comparing to actual results`, async () => {
+    const { id: streakId, query: streakQuery } = STREAK_QUERY('gql-test-session')
+    console.info(JSON.stringify({ streakId, streakQuery }, null, 4))
+    const streakResultWrap = await graphql(schema, streakQuery)
+    const result = streakResultWrap?.data?.getStreak
+    // console.info('streak', JSON.stringify({ result }, null, 4))
+    // calc streak independently:
+    let winner = winners[0]
+    let streakLength = 1
+    // console.info(JSON.stringify({ winners: [...winners] }, null, 4))
+    for (let i = 1; i < winners.length; i += 1) {
+      // console.info('for each winner', i)
+      const currentWinner = winners.pop()
+      streakLength++
+      if (i === 0) winner = currentWinner || false
+      if (winner !== currentWinner) break
+    }
+    return expect({
+      success: result.success,
+      winner: result.streak?.winner,
+      length: result.streak?.length,
+    }).toEqual({ success: true, winner, length: streakLength })
+  })
 })

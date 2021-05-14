@@ -9,7 +9,7 @@ type Card {
   suit: Int!
 }
 type Game {
-  id: ID!
+  gameId: Int!
   deck: [Card]
   board: [Card]
   cardsUsed: [Card]
@@ -21,19 +21,25 @@ type GameResult {
   game: Game
   msg: String
 }
-type StreakResult {
-  winner: Boolean!
-  streak: Int!
+type Result {
+  success: Boolean!
 }
-input GameId {
-  gameId: Int!
+type Streak {
+  winner: Boolean!
+  length: Int!
 }
 
+type StreakResult {
+  success: Boolean!
+  streak: Streak
+  msg: String
+}
 type Query {
-  streaks: StreakResult
+  getStreak(sessionID: String): StreakResult
 }
 
 type Mutation {
-  shuffle: GameResult
-  deal(gameId: GameId): GameResult
+  shuffle(sessionID: String): GameResult
+  deal(sessionID: String, gameId: Int!): GameResult
+  resetSession(sessionID: String!): Result
 }
