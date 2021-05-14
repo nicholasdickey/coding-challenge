@@ -76,6 +76,7 @@ export async function lazyInitSchema() {
 }
 export async function resetSession(sessionID: string): Promise<boolean> {
   try {
+    await lazyInitSchema()
     const gamesResult = await query('SELECT game_id from node_games where session_id=$1', [
       sessionID,
     ])
