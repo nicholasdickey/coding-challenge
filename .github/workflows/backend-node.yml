@@ -34,7 +34,7 @@ jobs:
 
       - name: Install dependencies
         # Always run this, so it throws if the package and lockfile don't match
-        run: cd node-server && yarn install --production=false --non-interactive --frozen-lockfile --cache-folder ~/node_modules/.cache/yarn
+        run: cd node-server && yarn install --production=false --non-interactive --cache-folder ~/node_modules/.cache/yarn
 
       - name: GQL Codegen
         run: cd node-server && yarn run gql-codegen
