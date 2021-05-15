@@ -10,12 +10,12 @@ services:
     build:
       context: .
       dockerfile: ./docker/Docker.server/backend.Dockerfile
-    image: 'hudsonwilde/ccb'
-    working_dir: /home/app
+    image: 'hudsonwilde/challenge-backend'
+    working_dir: /home/app/node-server
     env_file: .env
     #container_name: challenge-fe
     volumes:
-      - homeapp:/home/app
+      - .:/home/app
     ports:
       - '3012:3000'
       - '8000:8000'

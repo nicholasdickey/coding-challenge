@@ -1,14 +1,17 @@
 // ./src/deck.ts
 // All game logic and state manipulation
+
+
+
+import Immutable from 'immutable'
 // eslint-disable-next-line
-import { Dispatch, SetStateAction } from 'react'
-import {
-  // eslint-disable-next-line
+import type {
   Game,
-  // eslint-disable-next-line
   CardDatum,
-  // eslint-disable-next-line
   Suits,
+} from 'types'
+
+import {
   cardLiteralA,
   cardLiteralJ,
   cardLiteralQ,
@@ -21,10 +24,12 @@ const ACE = 1
 const JOHN = 11
 const QUEEN = 12
 const KING = 13
-const NUM_SHUFFLES = 50
-export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
+
+export function sleep(ms: number): Promise<number> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
+/* refactor for GQL */
+/*
 function innerShuffle(deck: CardDatum[]): CardDatum[] {
   const returnDeck = deck
   let curId = deck.length
@@ -43,7 +48,7 @@ function innerShuffle(deck: CardDatum[]): CardDatum[] {
 export function shuffle(): CardDatum[] {
   let deck: CardDatum[] = []
   const suits: Suits[] = ['hearts', 'diamonds', 'clubs', 'spades']
-  suits.forEach(suit => {
+  suits.forEach((suit) => {
     for (let card = ACE; card <= KING; card += 1) {
       let cardString
       switch (card) {
@@ -72,6 +77,8 @@ export function shuffle(): CardDatum[] {
   for (let i = 0; i < NUM_SHUFFLES; i += 1) deck = innerShuffle(deck)
   return deck
 }
+*/
+/* refactor for GQL 
 export const initGame = (): Game => {
   return {
     cardsLeft: TOTAL_CARDS,
@@ -81,55 +88,112 @@ export const initGame = (): Game => {
     ended: false,
     inflight: false,
   }
-}
-export const dealOne = ({ cardsLeft, cardsUsed, deck }: Game, board: CardDatum[]): Game => {
-  const outBoard = [...board]
-  let outCardsLeft = cardsLeft
-  const outCardsUsed = [...cardsUsed]
-  const outDeck = [...deck]
+} */
 
-  const nextCard = outDeck.pop()
-
-  if (typeof nextCard === 'undefined')
-    return { cardsLeft, cardsUsed, deck, board, ended: false, inflight: true }
-
-  outCardsUsed.push(nextCard)
-  outBoard.push(nextCard)
-  outCardsLeft -= 1
-  if (outCardsLeft < 0) throw new Error('Unexpected condition -cardsLeft<0')
-
+export const initGame = (): Game => {
   return {
-    cardsLeft: outCardsLeft,
-    cardsUsed: outCardsUsed,
-    deck: outDeck,
-    board: outBoard,
+    cardsLeft: TOTAL_CARDS,
+    cardsUsed: [] as CardDatum[],
+    deck: [] as CardDatum[],
+    board: [] as CardDatum[],
     ended: false,
-    inflight: true,
+    winner: false,
+    gameId:0,
+    inflight: false,
   }
 }
-export const deal = async (game: Game, setGame: Dispatch<SetStateAction<Game>>): Promise<void> => {
-  let gameUpdate = game
-  let board: CardDatum[] = []
-  setGame({ ...game, ...{ board, inflight: true } })
-  await sleep(50)
+declare type ImmutableValue=string|number|boolean|Record<string,unknown>
+export const dealOne = (inGame:  Immutable.Map<string,ImmutableValue>, stateGame: Immutable.Map<string,ImmutableValue>):  Immutable.Map<string,ImmutableValue> => {
+  const inGameJS=inGame.toJS() as Game
+  const outGame: Game = stateGame.set("inflight", true).toJS() as Game
+
+  outGame.winner = inGameJS.winner;
+  outGame.ended = inGameJS.ended;
+  console.info("dealOne created outGame",outGame)
+  const boardLength = outGame.board.length
+  if (boardLength < ONE_HAND) {
+    const nextCard = inGameJS.board[boardLength]
+    if (typeof nextCard === 'undefined') {
+      outGame.inflight = false;
+        return Immutable.fromJS(outGame)
+    }
+    outGame.deck.pop()
+    outGame.cardsUsed.push(nextCard);
+    outGame.board.push(nextCard)
+    outGame.cardsLeft -= 1;
+    if (outGame.cardsLeft < 0) throw new Error('Unexpected condition -cardsLeft<0')
+  }
+  return Immutable.fromJS(outGame)
+}
+export const reset = (setGame: (game: Game) => void): void => {
+  setGame(initGame())
+}
+export const deal = async (inGameJS: Game,gameJS: Game, setGame: (game: Game) => void): Promise<number> => {
+  
+  const inGame = Immutable.fromJS(inGameJS);
+  let game = Immutable.fromJS(gameJS)
+  const emptyBoard: CardDatum[] = []
+  game=game.merge({
+    board:emptyBoard,
+    inflight: true
+  })
+  setGame(game.toJS())
+  const p = await sleep(50)
+  let currentGame = game;
   for (let pass = 1; pass <= ONE_HAND; pass += 1) {
-    gameUpdate = dealOne(gameUpdate, board)
-    board = gameUpdate.board
-    setGame(gameUpdate)
+    console.info("deal: inGame",inGame.toJS())
+    const outGame = dealOne(inGame, currentGame)
+    console.info("deal after dealOne ",outGame.toJS())
+    setGame(outGame.toJS() as Game)
+    currentGame = outGame;
     // eslint-disable-next-line
     await sleep(150)
-    if (pass === ONE_HAND && board.length <= 2) {
-      setGame({ ...gameUpdate, ended: true, inflight: false })
-      console.info('setEnded')
+  
+    if (pass === ONE_HAND && inGameJS.board.length <= 2) {
+      setGame(outGame.merge({ended: true, inflight: false }).toJS() as Game)
     } else if (pass === ONE_HAND) {
-      // eslint-disable-next-line
-      setTimeout(() => setGame({ ...gameUpdate, ...{ inflight: false } }), 500)
+      
+      setTimeout(() => setGame(outGame.merge({ inflight: false } ).toJS() as Game), 500)
     }
   }
+  return p
 }
-
-export const reset = (setGame: Dispatch<SetStateAction<Game>>): void => {
-  setGame(initGame())
-  // eslint-disable-next-line
-  console.info('reset')
+export function importGQLCards(cards: { value: number, suit: number }[]): CardDatum[] {
+  const suits: Suits[] = ['hearts', 'diamonds', 'clubs', 'spades']
+  return cards.map((card: { value: number, suit: number }) => {
+    let cardString: string = card.value.toString();
+    if (card.value===1||card.value > 10)
+        switch (card.value) {
+        case ACE:
+          cardString = cardLiteralA
+          break
+        case JOHN:
+          cardString = cardLiteralJ
+          break
+        case QUEEN:
+          cardString = cardLiteralQ
+          break
+        case KING:
+          cardString = cardLiteralK
+          break
+        default:
+          cardString = `${card}`
+      }
+    
+    return {
+    card: cardString,
+    suit: suits[card.suit]
+  }})
+}
+export function importGQLGame(inGame: { gameId: number, winner: boolean, ended: boolean, deck: { value: number, suit: number }[], board: { value: number, suit: number }[], cardsUsed: { value: number, suit: number }[] }): Game {
+  return {
+    deck: importGQLCards(inGame.deck),
+    board: importGQLCards(inGame.board),
+    cardsUsed: importGQLCards(inGame.cardsUsed),
+    cardsLeft: inGame.deck.length,
+    ended: inGame.ended,
+    winner: inGame.winner,
+    gameId: inGame.gameId,
+    inflight: false,
+  }
 }

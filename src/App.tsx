@@ -1,18 +1,53 @@
+import { useMutation, useLazyQuery } from '@apollo/client'
 import React from 'react'
+import { SHUFFLE_MUTATION, NEXTHAND_MUTATION, STREAK_QUERY } from './gql'
 import Card from 'Card'
 import { ReactComponent as Winner } from 'assets/winner.svg'
-import { initGame, deal, reset } from 'deck'
-
+import { initGame, importGQLGame, deal } from 'deck'
 // eslint-disable-next-line
-import { cardLiteralA } from 'types'
+import type {
+  CardDatum,
+} from 'types'
 
 function App() {
-  const [game, setGame] = React.useState(initGame())
+  const [game, setGame] = React.useState((initGame()))
+  const [streak, setStreak] = React.useState(0)
+  const [shuffle] = useMutation(SHUFFLE_MUTATION, {
+    variables: { sessionID: 'uplifty-client-session' },
+    onCompleted: data => {
+      console.info('shuffle completed', data)
+      const inGame = data.shuffle.game
+      const outGame = importGQLGame(inGame)
+      console.info('setting Status: ', JSON.stringify({ outGame }, null, 4))
+      setGame(outGame)
+    },
+  })
+  const [getStreak] = useLazyQuery(STREAK_QUERY, {
+    variables: { sessionID: 'uplifty-client-session' },
+    onCompleted: data => {
+      console.info('shuffle completed', data)
+      const inStreak = data.getStreak.streak
 
-  const winner =
-    game.ended && (game.board[0].card === cardLiteralA || game.board[1].card === cardLiteralA)
-      ? true
-      : false
+      console.info('setting Status: ', JSON.stringify({ inStreak }, null, 4))
+      setStreak(inStreak)
+    },
+  })
+  const [nextHand] = useMutation(NEXTHAND_MUTATION, {
+    onCompleted: data => {
+      console.info('nextHand completed', data)
+      const inGame = data.nextHand.game
+      const outGame = importGQLGame(inGame)
+      console.info('setting Status: ', JSON.stringify({ outGame }, null, 4))
+      deal(outGame, game, setGame)
+      if (outGame.ended) getStreak()
+      // setGame(Immutable.fromJS(outGame))
+    },
+  })
+
+  console.info('APP game:', game)
+
+  const { winner } = game
+  const firstGame = game.deck.length === 0 && game.cardsUsed.length === 0
   /**
    * See note in Card.tsx on the reason for using style React attribute.
    * In this case it is to override h-screen property of Tailwind and provide graceful degrading of responsive appearance when window height is below 600px
@@ -22,11 +57,19 @@ function App() {
     <div className="h-screen flex flex-col bg-gray-300 pb-0">
       <div
         className="w-auto relative h-full bg-gradient-to-b from-card-light via-card-medium to-card-dark"
-        style={{ minHeight: 420 }}
+        style={{ minHeight: 400 }}
       >
-        {game.board.map((card, i) => {
+        {game.board.map((card: CardDatum, i: number) => {
+          console.info("Creating card:",i, card)
           return (
-            <Card key={`${i + 1}:key`} x={0} y={0} position={i} value={card} ended={game.ended} />
+            <Card
+              key={`${card.card}-${card.suit}:card`}
+              x={0}
+              y={0}
+              position={i}
+              value={card}
+              ended={game.ended}
+            />
           )
         })}
       </div>
@@ -37,7 +80,7 @@ function App() {
         </div>
         {winner ? (
           <div className="absolute top-18 flex items-start justify-start w-full h-40">
-            <div className=" mx-auto">
+            <div className=" mx-auto w-full">
               <Winner className="w-full px-4" />
             </div>
           </div>
@@ -49,25 +92,40 @@ function App() {
           style={{ minHeight: 300 }}
         >
           <div className="m-auto w-full flex items-center justify-center z-20">
-            {game.ended ? (
+            {game.ended || firstGame ? (
               <div className="w-full">
                 <div className="w-full font-rock text-white  text-2xl lg:text-5xl w-full text-center px-4">
-                  {winner ? <div>Great job! You won the game!</div> : <div>You Lose, Sucker!</div>}
+                  {winner ? (
+                    <div>Great job! You won the game!</div>
+                  ) : firstGame ? (
+                    <div>Welcome to Uplifty!</div>
+                  ) : (
+                    <div>You Lose, Sucker!</div>
+                  )}
                 </div>
                 <div className="w-full flex items-center justify-center m-auto pt-6">
                   <button
                     type="button"
-                    onClick={() => reset(setGame)}
+                    onClick={() => shuffle()}
                     className="m-auto w-1/8 p-2 opacity-80 hover:bg-blue-800 py-1 px-4 border border-yellow-400 rounded "
                   >
-                    <div className="font-rock text-yellow-400 text-lg">Play Again</div>
+                    <div className="font-rock text-yellow-400 text-lg">
+                      {firstGame ? 'Play' : 'Play Again'}
+                    </div>
                   </button>
                 </div>
               </div>
             ) : (
               <button
                 type="button"
-                onClick={() => deal(game, setGame)}
+                onClick={() =>
+                  nextHand({
+                    variables: {
+                      sessionID: 'uplifty-client-session',
+                      gameId: game.gameId,
+                    },
+                  })
+                }
                 disabled={game.inflight}
                 className={`"m-auto w-1/8 p-6 h-18  bg-yellow-400 opacity-80  hover:bg-blue-800 py-1 px-2 border border-black rounded"`}
               >
@@ -77,11 +135,12 @@ function App() {
               </button>
             )}
           </div>
+
           <div className="absolute bottom-28 w-full ">
             <div className=" h-full flex items-end justify-end mb-0 pb-0 mr-12">
               <button
                 type="button"
-                onClick={() => reset(setGame)}
+                onClick={() => shuffle()}
                 className="w-1/8 h-20 mb-2 py-1  opacity-80 hover:bg-blue-800  px-2 border border-yellow-400 rounded "
               >
                 <div className="font-rock text-yellow-400 text-lg">Reset</div>

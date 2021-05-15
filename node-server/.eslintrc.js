@@ -1,5 +1,4 @@
 module.exports = {
-  root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: './tsconfig.json',
@@ -10,6 +9,7 @@ module.exports = {
   },
   plugins: ['@typescript-eslint', 'import', 'graphql'],
   extends: [
+    'react-app',
     'airbnb',
     'plugin:@typescript-eslint/recommended',
     'plugin:import/errors',
@@ -18,19 +18,28 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   rules: {
-    'no-plusplus': 0,
+    'no-nested-ternary': 0,
+    'no-unneeded-ternary': 0,
     'no-console': ['error', { allow: ['info', 'warn', 'error'] }],
     'no-underscore-dangle': ['error', { allow: ['__typename'] }],
     'class-methods-use-this': 0,
-    'graphql/capitalized-type-name': ['warn', { schemaJson: require('./schema.json') }],
-    'graphql/named-operations': ['warn', { schemaJson: require('./schema.json') }],
+    'react/jsx-curly-newline': 0,
+    'react/jsx-filename-extension': 0,
+    'react/jsx-indent': 0,
+    'react/jsx-one-expression-per-line': 0,
+    'react/jsx-props-no-spreading': 0,
+    'react/jsx-wrap-multilines': 0,
+    'react/prefer-stateless-function': 0,
+    'react/no-array-index-key': 0,
+    'graphql/capitalized-type-name': ['warn', { schemaJson: require('./node-server/schema.json') }],
+    'graphql/named-operations': ['warn', { schemaJson: require('./node-server/schema.json') }],
     'graphql/required-fields': [
       'error',
-      { schemaJson: require('./schema.json'), requiredFields: ['id'] },
+      { schemaJson: require('./node-server/schema.json'), requiredFields: ['id'] },
     ],
     'graphql/template-strings': [
       'error',
-      { env: 'apollo', schemaJson: require('./schema.json'), tagName: 'gql' },
+      { env: 'apollo', schemaJson: require('./node-server/schema.json'), tagName: 'gql' },
     ],
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'import/extensions': 0,
@@ -74,24 +83,27 @@ module.exports = {
     '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'no-public' }],
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/member-delimiter-style': 0,
-    '@typescript-eslint/no-explicit-any': 0,
   },
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
-    },
-    {
-      files: ['*.test.ts', '*.test.tsx', '*.stories.ts', '*.stories.tsx', 'create_db.ts'],
       rules: {
-        '@typescript-eslint/ban-ts-ignore': 0,
+        'react/prop-types': 0,
+        '@typescript-eslint/no-nested-ternary': 0,
       },
     },
     {
-      files: ['*.js'],
+      files: ['*.js', '*.tsx'],
       rules: {
-        'global-require': 0,
-        'no-var': 0,
-        '@typescript-eslint/no-var-requires': 0,
+        '@typescript-eslint/recommended': 'off',
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
+        'no-param-reassign': 'off',
+      },
+    },
+    {
+      files: ['*.test.ts', '*.test.tsx', '*.stories.ts', '*.stories.tsx'],
+      rules: {
+        '@typescript-eslint/ban-ts-ignore': 0,
       },
     },
   ],

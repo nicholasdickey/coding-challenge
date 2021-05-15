@@ -44,12 +44,12 @@ const SHUFFLE_MUTATION = (sessionID: string) => {
     `,
   }
 }
-const DEAL_MUTATION = (sessionID: string, gameId: number) => {
+const NEXTHAND_MUTATION = (sessionID: string, gameId: number) => {
   return {
     id: 'Mutation to get a top the five cards from existing game/deck',
     query: `
       mutation {
-        deal(sessionID:"${sessionID}", gameId:${gameId}) {
+        nextHand(sessionID:"${sessionID}", gameId:${gameId}) {
             success
             game{
                 gameId
@@ -131,7 +131,7 @@ describe(`GQL Test`, () => {
       cardsUsedLength: 0,
     })
   })
-  it(`Test deal`, async () => {
+  it(`Test nextHand`, async () => {
     // describe(`Deal`, async () => {
 
     await graphql(schema, resetQuery)
@@ -143,13 +143,13 @@ describe(`GQL Test`, () => {
       // eslint-disable-next-line no-await-in-loop
       const shuffleResultWrap = await graphql(schema, shuffleQuery)
       const gameId = shuffleResultWrap?.data?.shuffle?.game?.gameId
-      const { id: dealId, query: dealQuery } = DEAL_MUTATION('gql-test-session', gameId)
+      const { id: dealId, query: dealQuery } = NEXTHAND_MUTATION('gql-test-session', gameId)
       console.info(JSON.stringify({ dealId, dealQuery }, null, 4))
       while (!ended) {
         // eslint-disable-next-line no-await-in-loop
         const resultWrap = await graphql(schema, dealQuery)
         // console.info(JSON.stringify({ resultWrap }, null, 4))
-        const result = resultWrap?.data?.deal
+        const result = resultWrap?.data?.nextHand
         // console.info(JSON.stringify({ result }, null, 4))
         if (firstRun) {
           // eslint-disable-next-line no-constant-condition

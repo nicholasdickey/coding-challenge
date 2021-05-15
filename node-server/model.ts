@@ -83,7 +83,7 @@ export async function shuffle(sessionID: string): Promise<Game> {
   // console.info('modl:shuffle: gameId:', gameId)
   return getGame(sessionID, gameId)
 }
-export async function deal(sessionID: string, gameId: number): Promise<Game> {
+export async function nextHand(sessionID: string, gameId: number): Promise<Game> {
   const preGame = await getGame(sessionID, gameId)
   const postGame = dealHand(preGame)
   await updateGame(sessionID, postGame)

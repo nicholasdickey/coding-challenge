@@ -40,6 +40,6 @@ type Query {
 
 type Mutation {
   shuffle(sessionID: String): GameResult
-  deal(sessionID: String, gameId: Int!): GameResult
-  resetSession(sessionID: String!): Result
+  nextHand(sessionID: String, gameId: Int!): GameResult
+  resetSession(sessionID: String): Result
 }

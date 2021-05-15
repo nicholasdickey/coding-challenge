@@ -1,5 +1,5 @@
 import { GameResult, StreakResult } from './graphql-types'
-import { shuffle, deal, streak, clearSession } from './model'
+import { shuffle, nextHand, streak, clearSession } from './model'
 
 export const resolvers = {
   Query: {
@@ -51,7 +51,7 @@ export const resolvers = {
       ) */
       return gameResult
     },
-    deal: async (parent: any, args: any, context: any): Promise<GameResult> => {
+    nextHand: async (parent: any, args: any, context: any): Promise<GameResult> => {
       // eslint-disable-next-line
       const { sessionID } = context ? context : args
       const { gameId } = args
@@ -59,7 +59,7 @@ export const resolvers = {
         success: false,
       }
       try {
-        gameResult.game = await deal(sessionID, gameId)
+        gameResult.game = await nextHand(sessionID, gameId)
         gameResult.success = true
       } catch (error) {
         console.error(error)

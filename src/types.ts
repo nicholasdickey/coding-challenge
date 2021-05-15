@@ -1,11 +1,13 @@
 export type Suits = 'hearts' | 'diamonds' | 'clubs' | 'spades'
 export type CardDatum = { suit: Suits; card: string }
 export type Game = {
+  gameId?: number
   cardsLeft: number
   cardsUsed: CardDatum[]
   deck: CardDatum[]
   board: CardDatum[]
   ended: boolean
+  winner?: boolean
   inflight: boolean
 }
 export const cardLiteralA = 'A'
