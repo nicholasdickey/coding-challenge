@@ -1,16 +1,18 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React from 'react'
-import { SHUFFLE_MUTATION, NEXTHAND_MUTATION, STREAK_QUERY,CURRENT_GAME_QUERY } from './gql'
+import WebFont from 'webfontloader';
+
+import { SHUFFLE_MUTATION, NEXTHAND_MUTATION, STREAK_QUERY, CURRENT_GAME_QUERY } from './gql'
 import Card from 'Card'
 import { ReactComponent as Winner } from 'assets/winner.svg'
 import { initGame, importGQLGame, deal } from 'deck'
 // eslint-disable-next-line
 import type { CardDatum } from 'types'
 
-function App() {
+function App({ sessionID }: {sessionID:string}) {
   const [game, setGame] = React.useState((initGame()))
   useQuery(CURRENT_GAME_QUERY, {
-    variables: { sessionID: 'uplifty-client-session' },
+    variables: { sessionID },
     onCompleted: data => {
       const inGame = data.getCurrentGame.game
       const outGame = importGQLGame(inGame)
@@ -19,7 +21,7 @@ function App() {
   })
   let streak = { winner: false, length: 0 };
   const [shuffle] = useMutation(SHUFFLE_MUTATION, {
-    variables: { sessionID: 'uplifty-client-session' },
+    variables: { sessionID },
     onCompleted: data => {
       const inGame = data.shuffle.game
       const outGame = importGQLGame(inGame)
@@ -28,7 +30,7 @@ function App() {
   })
   
   const { data:streakData,refetch:getStreak } = useQuery(STREAK_QUERY, {
-    variables: { sessionID: 'uplifty-client-session' },
+    variables: { sessionID},
   })
   if (streakData)
     streak = streakData.getStreak.streak;
@@ -42,7 +44,13 @@ function App() {
       }
     },
   })
-
+  React.useEffect(() => {
+   WebFont.load({
+     google: {
+       families: ['Rockwell', 'Alpha Slab One']
+     }
+   });
+  }, []);
   const { winner } = game
   const firstGame = game.deck.length === 0 && game.cardsUsed.length === 0
   /**
@@ -95,7 +103,7 @@ function App() {
                   {winner ? (
                     <div>Great job! You won the game!</div>
                   ) : firstGame ? (
-                    <div>Welcome to Card Challenge!</div>
+                    <div>Welcome to Cards!</div>
                   ) : (
                     <div>You Lose, Sucker!</div>
                   )}
@@ -118,7 +126,7 @@ function App() {
                 onClick={() =>
                   nextHand({
                     variables: {
-                      sessionID: 'uplifty-client-session',
+                      sessionID,
                       gameId: game.gameId,
                     },
                   })

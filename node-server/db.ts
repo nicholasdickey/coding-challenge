@@ -167,7 +167,6 @@ export async function getGame(sessionID: string, gameId: number): Promise<Game> 
 export async function getCurrentGame(sessionID: string): Promise<Game> {
   try {
     await lazyInitSchema()
-
     const gameResults = await query(
       `SELECT game_id,ended,winner from node_games where session_id=$1 and ended=false ORDER BY time_ended desc LIMIT 1`,
       [sessionID]
@@ -228,7 +227,7 @@ export async function getStreak(
     let streak
     const singleGame = async (ordinal: number): Promise<boolean> => {
       const result = await query(
-        `SELECT winner from node_games where session_id=$1 order by time_ended DESC LIMIT 1 OFFSET ${ordinal};`,
+        `SELECT winner from node_games where session_id=$1 and ended order by time_ended DESC LIMIT 1 OFFSET ${ordinal};`,
         [sessionID]
       )
       return result.rows[0]?.winner
@@ -236,6 +235,11 @@ export async function getStreak(
     let ordinal = 0
 
     const winner = await singleGame(ordinal++)
+    if (typeof winner === 'undefined')
+      return {
+        winner: false,
+        streak: 0,
+      }
     let currentWinner = winner
     streak = 0
     while (winner === currentWinner) {

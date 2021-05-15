@@ -28,10 +28,10 @@ describe('Test db layer', function() {
     await resetSession(SESSION_ID)
 
     try {
-      const noGame = await getGame(SESSION_ID, 1)
+      const noGame = await getGame(SESSION_ID, -1)
       expect(typeof noGame).toEqual('undefined')
     } catch (error) {
-      expect(error.toString()).toEqual('Error: The game 1 for session test-session-ID is missing')
+      expect(error.toString()).toEqual('Error: The game -1 for session test-session-ID is missing')
     }
     const deck = shuffle()
     gameId = await startGame(SESSION_ID, deck)
@@ -68,7 +68,7 @@ describe('Test db layer', function() {
     const streak: Streak = await getStreak(SESSION_ID)
     expect(streak).toEqual({
       winner: false,
-      streak: 5,
+      streak: 0,
     })
   })
-})
+}

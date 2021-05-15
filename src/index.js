@@ -1,5 +1,6 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { ApolloProvider } from '@apollo/client/react'
+import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -13,10 +14,16 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
   credentials: 'same-origin',
 })
-
-ReactDOM.render(
-  <ApolloProvider client={client}>
-    <App />
-  </ApolloProvider>,
-  document.getElementById('root')
-)
+// Initialize an agent at application startup.
+const fpPromise = FingerprintJS.load()
+;(async () => {
+  const fp = await fpPromise
+  const result = await fp.get()
+  const sId = result.visitorId
+  ReactDOM.render(
+    <ApolloProvider client={client}>
+      <App sessionID={sId} />
+    </ApolloProvider>,
+    document.getElementById('root')
+  )
+})()

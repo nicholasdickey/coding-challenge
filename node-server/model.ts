@@ -107,5 +107,9 @@ export async function clearSession(sessionID: string): Promise<boolean> {
   return resetSession(sessionID)
 }
 export async function currentGame(sessionID: string): Promise<Game> {
-  return getCurrentGame(sessionID)
+  const game = await getCurrentGame(sessionID)
+  if (game.gameId === 0) {
+    return shuffle(sessionID)
+  }
+  return game
 }

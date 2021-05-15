@@ -104,20 +104,6 @@ describe(`GQL Test`, () => {
     const resultWrap = await graphql(schema, shuffleQuery)
     const result = resultWrap?.data?.shuffle
 
-    console.info(
-      JSON.stringify(
-        {
-          result: {
-            success: result.success,
-            deckLength: result.game?.deck?.length,
-            boardLength: result.game?.board?.length || 0,
-            cardsUsedLength: result.game?.cardsUsed?.length,
-          },
-        },
-        null,
-        4
-      )
-    )
     return expect({
       success: result.success,
       deckLength: result.game?.deck?.length,

@@ -31,15 +31,15 @@ module.exports = {
     'react/jsx-wrap-multilines': 0,
     'react/prefer-stateless-function': 0,
     'react/no-array-index-key': 0,
-    'graphql/capitalized-type-name': ['warn', { schemaJson: require('./server/schema.json') }],
-    'graphql/named-operations': ['warn', { schemaJson: require('./server/schema.json') }],
+    'graphql/capitalized-type-name': ['warn', { schemaJson: require('./node-server/schema.json') }],
+    'graphql/named-operations': ['warn', { schemaJson: require('./node-server/schema.json') }],
     'graphql/required-fields': [
       'error',
-      { schemaJson: require('./server/schema.json'), requiredFields: ['id'] },
+      { schemaJson: require('./node-server/schema.json'), requiredFields: ['id'] },
     ],
     'graphql/template-strings': [
       'error',
-      { env: 'apollo', schemaJson: require('./server/schema.json'), tagName: 'gql' },
+      { env: 'apollo', schemaJson: require('./node-server/schema.json'), tagName: 'gql' },
     ],
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'import/extensions': 0,
@@ -83,8 +83,6 @@ module.exports = {
     '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'no-public' }],
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/member-delimiter-style': 0,
-    '@typescript-eslint/no-explicit-any': 0,
-    '@typescript-eslint/explicit-module-boundary-types': 0,
   },
   overrides: [
     {
@@ -99,6 +97,7 @@ module.exports = {
       rules: {
         '@typescript-eslint/recommended': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
+        'no-param-reassign': 'off',
       },
     },
     {
