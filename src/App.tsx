@@ -1,4 +1,4 @@
-import { useMutation, useLazyQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import React from 'react'
 import { SHUFFLE_MUTATION, NEXTHAND_MUTATION, STREAK_QUERY } from './gql'
 import Card from 'Card'
@@ -11,7 +11,8 @@ import type {
 
 function App() {
   const [game, setGame] = React.useState((initGame()))
-  const [streak, setStreak] = React.useState(0)
+  // const [streak, setStreak] = React.useState({winner:false,length:0})
+  let streak = { winner: false, length: 0 };
   const [shuffle] = useMutation(SHUFFLE_MUTATION, {
     variables: { sessionID: 'uplifty-client-session' },
     onCompleted: data => {
@@ -22,25 +23,28 @@ function App() {
       setGame(outGame)
     },
   })
-  const [getStreak] = useLazyQuery(STREAK_QUERY, {
+  const { data:streakData,refetch:getStreak } = useQuery(STREAK_QUERY, {
     variables: { sessionID: 'uplifty-client-session' },
     onCompleted: data => {
       console.info('shuffle completed', data)
-      const inStreak = data.getStreak.streak
-
-      console.info('setting Status: ', JSON.stringify({ inStreak }, null, 4))
-      setStreak(inStreak)
+      /* const inStreak = data.getStreak.streak
+      console.info('setting Streak Status: ', JSON.stringify({ inStreak }, null, 4))
+      setStreak(inStreak) */
     },
   })
+  if (streakData)
+    streak = streakData.getStreak.streak;
   const [nextHand] = useMutation(NEXTHAND_MUTATION, {
     onCompleted: data => {
       console.info('nextHand completed', data)
       const inGame = data.nextHand.game
       const outGame = importGQLGame(inGame)
-      console.info('setting Status: ', JSON.stringify({ outGame }, null, 4))
+      console.info('nextHand setting Status: ', JSON.stringify({ outGame }, null, 4))
       deal(outGame, game, setGame)
-      if (outGame.ended) getStreak()
-      // setGame(Immutable.fromJS(outGame))
+      if (outGame.ended) {
+        console.info('nextHand calling getStreak')
+        getStreak()
+      }
     },
   })
 
@@ -77,6 +81,7 @@ function App() {
         <div className=" mx-auto  mt-1 h-full xl:h-1/2 w-1/4 lg:w-1/5 bg-black border rounded border-yellow-400 text-white font-rock text-xl sm:text-2xl text-center max-h-20 xl:max-h-30 ">
           <div className="my-2">{game.cardsLeft}</div>
           <div className="my-4">Cards Left</div>
+          {streak.length > 0 ? <div className="my-4">{streak.winner ? `Winning Streak: ${streak.length}` : `Losing Streak: ${streak.length}`}</div>:null}
         </div>
         {winner ? (
           <div className="absolute top-18 flex items-start justify-start w-full h-40">

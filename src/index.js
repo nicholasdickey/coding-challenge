@@ -16,7 +16,7 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <ApolloProvider client={client}>
-    <App uri={REACT_APP_GRAPHQL_URI || window.REACT_APP_GRAPHQL_URI} />
+    <App />
   </ApolloProvider>,
   document.getElementById('root')
 )

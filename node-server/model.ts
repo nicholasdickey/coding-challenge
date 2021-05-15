@@ -62,8 +62,9 @@ const dealHand = ({
     } else break
   }
   if (outDeck.length === 0) {
-    for (let i = 0; i < board.length - 1; i += 1) {
+    for (let i = 0; i < board.length; i += 1) {
       if (board[i].value === ACE) {
+        console.info('SET WINNER:TRUE')
         outWinner = true
         break
       }
