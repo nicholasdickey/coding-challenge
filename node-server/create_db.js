@@ -9,6 +9,6 @@ const config = {
 pgtools.createdb(config, 'uplifty', function(err, res) {
   if (err) {
     console.error(err)
-    process.exit(-1)
+    // process.exit(-1)
   }
 })

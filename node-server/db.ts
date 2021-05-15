@@ -48,6 +48,11 @@ export async function lazyInitSchema() {
       'node_%',
     ])
     if (schemaResponse.rows?.length < 2) {
+      /* try {
+        await query('CREATE DATABASE uplifty;')
+      } catch (x) {
+        console.error('CREATE DATABASE uplifty failed', x)
+      } */
       await query(
         'CREATE TABLE IF NOT EXISTS node_games (game_id SERIAL PRIMARY KEY,session_id VARCHAR(126),ended BOOLEAN ,time_started TIMESTAMP,time_ended TIMESTAMP,winner BOOLEAN)'
       )
@@ -224,6 +229,7 @@ export async function getStreak(
   streak: number
 }> {
   try {
+    await lazyInitSchema()
     let streak
     const singleGame = async (ordinal: number): Promise<boolean> => {
       const result = await query(

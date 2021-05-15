@@ -6,21 +6,21 @@ services:
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
 
-  challenge-backend:
+  challenge-backend-node:
     build:
       context: .
       dockerfile: ./docker/Docker.server/backend.Dockerfile
-    image: 'hudsonwilde/challenge-backend'
-    working_dir: /home/app/node-server
+    image: 'hudsonwilde/challenge-backend-node'
+    working_dir: /home/app
     env_file: .env
-    #container_name: challenge-fe
+    container_name: challenge-backend-node
     volumes:
-      - homeapp:/home/app
+      - homeapp-node:/home/app
     ports:
       - '3012:3000'
-      - '8000:8000'
+      - '8001:8000'
     stdin_open: true
 
 volumes:
-  homeapp:
+  homeapp-node:
     driver: local

@@ -2,8 +2,8 @@
   "name": "uplifty",
   "version": "1.0.0",
   "description": "Node.js server backend for uplifty exercise.",
-  "main": "index.ts",
-  "author": "Uplift Agency Ltd.",
+  
+  "author": "Hudson Wilde",
   "license": "MIT",
   "private": true,
   "dependencies": {
@@ -18,7 +18,7 @@
   "scripts": {
     "gql-codegen": "graphql-codegen --config codegen.yml",
     "createDB": "node create_db.js",
-    "start": " ts-node -O '{\"module\":\"commonjs\"}' index.ts",
+    "start:ts": " ts-node -O '{\"module\":\"commonjs\"}' index-server.ts",
     "test": "npm-run-all eslint prettier:check jest",
     "jest": "jest --detectOpenHandles ",
     "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
