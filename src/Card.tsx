@@ -1,6 +1,7 @@
 // eslint-disable-next-line
-import React, { ReactElement } from 'react'
 import { Motion, spring } from 'react-motion'
+// eslint-disable-next-line
+import React, { ReactElement } from 'react'
 
 import { ReactComponent as Club } from 'assets/Clover.svg'
 import { ReactComponent as Diamond } from 'assets/Diamond.svg'

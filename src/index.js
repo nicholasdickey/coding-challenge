@@ -1,8 +1,10 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client'
-import { ApolloProvider } from '@apollo/client/react'
-import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import React from 'react'
+
+import { ApolloClient, InMemoryCache } from '@apollo/client'
+import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import ReactDOM from 'react-dom'
+
+import { ApolloProvider } from '@apollo/client/react'
 
 import './index.css'
 import App from './App'

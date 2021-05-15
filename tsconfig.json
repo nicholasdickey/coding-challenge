@@ -14,8 +14,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "preserve"
+    "jsx": "react-jsx",
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["**/*"],
-  "exclude": ["node_modules", "build"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build"],
+  "typeRoots": ["./src/@types", "./node_modules/@types"]
 }

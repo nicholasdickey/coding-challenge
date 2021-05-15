@@ -18,7 +18,7 @@
   "scripts": {
     "gql-codegen": "graphql-codegen --config codegen.yml",
     "createDB": "node create_db.js",
-    "start:server": " ts-node -O '{\"module\":\"commonjs\"}' index.ts",
+    "start": " ts-node -O '{\"module\":\"commonjs\"}' index.ts",
     "test": "npm-run-all eslint prettier:check jest",
     "jest": "jest --detectOpenHandles ",
     "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
