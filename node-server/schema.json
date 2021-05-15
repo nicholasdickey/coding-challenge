@@ -15,7 +15,7 @@
         "fields": [
           {
             "name": "value",
-            "description": null, 
+            "description": null,
             "args": [],
             "type": {
               "kind": "NON_NULL",
