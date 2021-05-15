@@ -71,4 +71,4 @@ describe('Test db layer', function() {
       streak: 0,
     })
   })
-}
+})
