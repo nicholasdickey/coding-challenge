@@ -136,7 +136,7 @@ describe(`GQL Test`, () => {
 
     await graphql(schema, resetQuery)
 
-    for (let gameIndex = 0; gameIndex < 2; gameIndex += 1) {
+    for (let gameIndex = 0; gameIndex < 6; gameIndex += 1) {
       let ended = false
       let firstRun = true
 
@@ -180,32 +180,19 @@ describe(`GQL Test`, () => {
           winners.push(result.game?.winner as boolean)
           if (gameIndex === 0) {
             const board: Card[] = result.game?.board as Card[]
-            console.info('gameIndex=0', JSON.stringify({ board }))
-            const card1 = board[0]
-            const card2 = board[1]
-            const winner: boolean = result.game?.winner as boolean
-            console.info(
-              'cards',
-              JSON.stringify({
-                card1,
-                card2,
-              })
-            )
-            console.info(
-              'values',
-              JSON.stringify({
-                winner,
-                value1: card1.value,
-                value2: card2.value,
-              })
-            )
+            let localWinner = false
+            board.forEach((card: Card) => {
+              if (card.value === 1) localWinner = true
+            })
+            // console.info('gameIndex=0', JSON.stringify({ board }))
 
-            expect(winner).toEqual(card1.value === 1 || card2.value === 1)
+            const winner: boolean = result.game?.winner as boolean
+            expect(winner).toEqual(localWinner)
           }
         }
       }
     }
-  }, 10000)
+  }, 60000)
 
   it(`Testing getStreak, comparing to actual results`, async () => {
     const { id: streakId, query: streakQuery } = STREAK_QUERY('gql-test-session')
@@ -214,16 +201,18 @@ describe(`GQL Test`, () => {
     const result = streakResultWrap?.data?.getStreak
     // console.info('streak', JSON.stringify({ result }, null, 4))
     // calc streak independently:
-    let winner = winners[0]
+    const winner = winners[winners.length - 1]
     let streakLength = 1
     // console.info(JSON.stringify({ winners: [...winners] }, null, 4))
-    for (let i = 1; i < winners.length; i += 1) {
+    for (let i = winners.length - 2; i >= 0; i--) {
       // console.info('for each winner', i)
-      const currentWinner = winners.pop()
-      streakLength++
-      if (i === 0) winner = currentWinner || false
+      const currentWinner = winners[i]
+
+      // if (i === 0) winner = currentWinner || false
       if (winner !== currentWinner) break
+      streakLength++
     }
+    console.info('WINNERS:', JSON.stringify({ winners, winner, length: streakLength }, null, 4))
     return expect({
       success: result.success,
       winner: result.streak?.winner,

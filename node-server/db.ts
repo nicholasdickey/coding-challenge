@@ -55,13 +55,11 @@ export async function lazyInitSchema() {
     ])
     if (schemaResponse.rows?.length < 2) {
       // console.info('schema is missing')
-      // eslint-disable-next-line
-      let createResult = await query(
+      await query(
         'CREATE TABLE IF NOT EXISTS node_games (game_id SERIAL PRIMARY KEY,session_id VARCHAR(126),ended BOOLEAN ,time_started TIMESTAMP,time_ended TIMESTAMP,winner BOOLEAN)'
       )
       // console.info('table node_games create result', JSON.stringify(createResult))
-      // eslint-disable-next-line
-      createResult = await query(
+      await query(
         `CREATE TABLE IF NOT EXISTS node_cards (card_id SERIAL PRIMARY KEY ,game_id INT, collection_type INT, ordinal INT, value INT, suit INT);`
       )
       // console.info('table node_cards create result', createResult)
@@ -117,8 +115,7 @@ async function updateCards(gameId: number, collectionType: CollectionType, cards
         )
       )
     }
-    // eslint-disable-next-line
-    const cardsResult = await Promise.all(inserts)
+    await Promise.all(inserts)
   } catch (error) {
     console.error('Caught exception in updateCards:', error)
     throw error

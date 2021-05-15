@@ -42,8 +42,6 @@ const dealHand = ({
   gameId,
   cardsUsed,
   deck,
-  ended,
-  winner,
 }: {
   gameId: number
   cardsUsed: Card[]
@@ -51,36 +49,39 @@ const dealHand = ({
   winner: boolean
   ended: boolean
 }): Game => {
+  let outWinner = false
+  let outEnded = false
+  const outDeck = [...deck]
+  const outCardsUsed = [...cardsUsed]
   const board: Card[] = []
   for (let i = 0; i < ONE_HAND; i += 1) {
-    const nextCard = deck.pop()
+    const nextCard = outDeck.pop()
     if (typeof nextCard !== 'undefined') {
-      cardsUsed.push(nextCard)
+      outCardsUsed.push(nextCard)
       board.push(nextCard)
     } else break
   }
-  if (board.length === 2) {
-    for (let i = 0; i < 2; i += 1) {
+  if (outDeck.length === 0) {
+    for (let i = 0; i < board.length - 1; i += 1) {
       if (board[i].value === ACE) {
-        // eslint-disable-next-line  no-param-reassign
-        winner = true
+        outWinner = true
+        break
       }
     }
-    // eslint-disable-next-line  no-param-reassign
-    ended = true
+    outEnded = true
   }
   return {
     gameId,
-    cardsUsed,
-    deck,
+    cardsUsed: outCardsUsed,
+    deck: outDeck,
     board,
-    ended,
-    winner,
+    ended: outEnded,
+    winner: outWinner,
   }
 }
 export async function shuffle(sessionID: string): Promise<Game> {
   const gameId = await startGame(sessionID, deckShuffle())
-  // console.info('modl:shuffle: gameId:', gameId)
+
   return getGame(sessionID, gameId)
 }
 export async function nextHand(sessionID: string, gameId: number): Promise<Game> {
