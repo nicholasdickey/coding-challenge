@@ -41,8 +41,11 @@ export default function Card({ x, y, position, value, ended }: CardParams) {
     case 'hearts':
       suit = <Heart className="h-full w-2/3  mt-2 pl-8 mb-1 mr-4" />
       break
-    default:
+    case 'diamonds':
       suit = <Diamond className="h-full w-2/3 mt-2 pl-2 ml-2 mb-2 mr-4" />
+      break
+    default:
+      throw Error('Unexpected value for suit')
   }
   /**
    * Why I am using React style instead of TailwindCSS class notation for left, bottom and rotate dynamic attributes?
@@ -57,12 +60,11 @@ export default function Card({ x, y, position, value, ended }: CardParams) {
    *
    *
    */
-  console.info('card ', position, ended)
   return (
     <Motion
       defaultStyle={{
         left: 50,
-        bottom: 4000,
+        bottom: 90,
         rotate: 0,
       }}
       style={{

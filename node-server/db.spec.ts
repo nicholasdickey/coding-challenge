@@ -3,6 +3,7 @@ import {
   getGame,
   updateGame,
   getStreak,
+  getCurrentGame,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   dropSchema,
   resetSession,
@@ -18,27 +19,23 @@ describe('Test db layer', function() {
   let gameId: number
   // eslint-disable-next-line
   it('Start Game, store and read back', async () => {
-    // await lazyInitSchema()
     /* 
     This can't be used for the routine CI regression testing for obvious reasons
     await dropSchema()
     
     */
-    //    console.log('after drop schema')
+
     await resetSession(SESSION_ID)
 
     try {
       const noGame = await getGame(SESSION_ID, 1)
-      console.info('noGame:', noGame)
+      expect(typeof noGame).toEqual('undefined')
     } catch (error) {
       expect(error.toString()).toEqual('Error: The game 1 for session test-session-ID is missing')
     }
     const deck = shuffle()
-    // console.info('in: deck:', deck)
     gameId = await startGame(SESSION_ID, deck)
-    // console.info('test initGame gameId:', gameId)
     game = await getGame(SESSION_ID, gameId)
-    console.info('game', game)
     expect({
       gameId,
       board: [],
@@ -47,13 +44,17 @@ describe('Test db layer', function() {
       winner: false,
       deck,
     }).toEqual(game)
+    const currentGame = await getCurrentGame(SESSION_ID)
+    expect(currentGame).toEqual(game)
   })
+
   it('Update game', async () => {
     const modifiedGame = dealOne(game)
-    // console.info(JSON.stringify({ modifiedGame }))
     await updateGame(SESSION_ID, modifiedGame)
     const updatedGame = await getGame(SESSION_ID, gameId)
     expect(updatedGame).toEqual(modifiedGame)
+    const currentGame = await getCurrentGame(SESSION_ID)
+    expect(currentGame).toEqual(updatedGame)
   })
   it('Test streak', async () => {
     await resetSession(SESSION_ID)

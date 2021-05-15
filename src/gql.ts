@@ -69,3 +69,27 @@ export const STREAK_QUERY = gql`
     }
   }
 `
+export const CURRENT_GAME_QUERY = gql`
+  query GetCurrentGame($sessionID: String) {
+    getCurrentGame(sessionID: $sessionID) {
+      success
+      game {
+        gameId
+        deck {
+          value
+          suit
+        }
+        board {
+          value
+          suit
+        }
+        cardsUsed {
+          value
+          suit
+        }
+        ended
+        winner
+      }
+    }
+  }
+`

@@ -1,54 +1,47 @@
 import { useMutation, useQuery } from '@apollo/client'
 import React from 'react'
-import { SHUFFLE_MUTATION, NEXTHAND_MUTATION, STREAK_QUERY } from './gql'
+import { SHUFFLE_MUTATION, NEXTHAND_MUTATION, STREAK_QUERY,CURRENT_GAME_QUERY } from './gql'
 import Card from 'Card'
 import { ReactComponent as Winner } from 'assets/winner.svg'
 import { initGame, importGQLGame, deal } from 'deck'
 // eslint-disable-next-line
-import type {
-  CardDatum,
-} from 'types'
+import type { CardDatum } from 'types'
 
 function App() {
   const [game, setGame] = React.useState((initGame()))
-  // const [streak, setStreak] = React.useState({winner:false,length:0})
+  useQuery(CURRENT_GAME_QUERY, {
+    variables: { sessionID: 'uplifty-client-session' },
+    onCompleted: data => {
+      const inGame = data.getCurrentGame.game
+      const outGame = importGQLGame(inGame)
+      setGame(outGame) 
+    },
+  })
   let streak = { winner: false, length: 0 };
   const [shuffle] = useMutation(SHUFFLE_MUTATION, {
     variables: { sessionID: 'uplifty-client-session' },
     onCompleted: data => {
-      console.info('shuffle completed', data)
       const inGame = data.shuffle.game
       const outGame = importGQLGame(inGame)
-      console.info('setting Status: ', JSON.stringify({ outGame }, null, 4))
       setGame(outGame)
     },
   })
+  
   const { data:streakData,refetch:getStreak } = useQuery(STREAK_QUERY, {
     variables: { sessionID: 'uplifty-client-session' },
-    onCompleted: data => {
-      console.info('shuffle completed', data)
-      /* const inStreak = data.getStreak.streak
-      console.info('setting Streak Status: ', JSON.stringify({ inStreak }, null, 4))
-      setStreak(inStreak) */
-    },
   })
   if (streakData)
     streak = streakData.getStreak.streak;
   const [nextHand] = useMutation(NEXTHAND_MUTATION, {
     onCompleted: data => {
-      console.info('nextHand completed', data)
       const inGame = data.nextHand.game
       const outGame = importGQLGame(inGame)
-      console.info('nextHand setting Status: ', JSON.stringify({ outGame }, null, 4))
       deal(outGame, game, setGame)
       if (outGame.ended) {
-        console.info('nextHand calling getStreak')
         getStreak()
       }
     },
   })
-
-  console.info('APP game:', game)
 
   const { winner } = game
   const firstGame = game.deck.length === 0 && game.cardsUsed.length === 0
@@ -64,7 +57,6 @@ function App() {
         style={{ minHeight: 400 }}
       >
         {game.board.map((card: CardDatum, i: number) => {
-          console.info("Creating card:",i, card)
           return (
             <Card
               key={`${card.card}-${card.suit}:card`}
@@ -103,7 +95,7 @@ function App() {
                   {winner ? (
                     <div>Great job! You won the game!</div>
                   ) : firstGame ? (
-                    <div>Welcome to Uplifty!</div>
+                    <div>Welcome to Card Challenge!</div>
                   ) : (
                     <div>You Lose, Sucker!</div>
                   )}

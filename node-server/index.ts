@@ -7,11 +7,10 @@ import { resolvers } from './resolvers'
 const typeDefs = fs.readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8').toString()
 
 const context = async ({ req }: { req: any }) => {
-  console.info('GraphQL Server, body.variables:', req.body.variables)
-  console.info('QUERY:', req.query, JSON.stringify(req.body, null, 4))
+  // console.info('GraphQL Server, body.variables:', req.body.variables)
+  // console.info('QUERY:', req.query, JSON.stringify(req.body, null, 4))
 
   const sessionID = req.query.sessionID || req.body.variables.sessionID || req.sessionID
-  console.info('SessionID', { sessionID })
   return {
     sessionID, // from the request (client)
   }

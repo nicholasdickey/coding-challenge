@@ -11,5 +11,4 @@ pgtools.createdb(config, 'uplifty', function(err, res) {
     console.error(err)
     process.exit(-1)
   }
-  console.info(res)
 })

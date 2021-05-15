@@ -102,7 +102,6 @@ describe(`GQL Test`, () => {
     const resetResult = await graphql(schema, resetQuery)
     expect(resetResult.data?.resetSession?.success).toEqual(true)
     const resultWrap = await graphql(schema, shuffleQuery)
-    // console.info('graphql result', JSON.stringify(resultWrap))
     const result = resultWrap?.data?.shuffle
 
     console.info(
@@ -132,8 +131,6 @@ describe(`GQL Test`, () => {
     })
   })
   it(`Test nextHand`, async () => {
-    // describe(`Deal`, async () => {
-
     await graphql(schema, resetQuery)
 
     for (let gameIndex = 0; gameIndex < 6; gameIndex += 1) {
@@ -143,20 +140,16 @@ describe(`GQL Test`, () => {
       // eslint-disable-next-line no-await-in-loop
       const shuffleResultWrap = await graphql(schema, shuffleQuery)
       const gameId = shuffleResultWrap?.data?.shuffle?.game?.gameId
-      const { id: dealId, query: dealQuery } = NEXTHAND_MUTATION('gql-test-session', gameId)
-      console.info(JSON.stringify({ dealId, dealQuery }, null, 4))
+      const { query: dealQuery } = NEXTHAND_MUTATION('gql-test-session', gameId)
       while (!ended) {
         // eslint-disable-next-line no-await-in-loop
         const resultWrap = await graphql(schema, dealQuery)
-        // console.info(JSON.stringify({ resultWrap }, null, 4))
         const result = resultWrap?.data?.nextHand
-        // console.info(JSON.stringify({ result }, null, 4))
         if (firstRun) {
           // eslint-disable-next-line no-constant-condition
           firstRun = false
           if (gameIndex === 0) {
             // run jest test only once
-
             expect({
               success: result?.success,
               deckLength: result?.game?.deck?.length,
@@ -176,7 +169,6 @@ describe(`GQL Test`, () => {
         }
         ended = result.game?.ended as boolean
         if (ended) {
-          // console.info('pushing winner:', result.game?.winner)
           winners.push(result.game?.winner as boolean)
           if (gameIndex === 0) {
             const board: Card[] = result.game?.board as Card[]
@@ -184,8 +176,6 @@ describe(`GQL Test`, () => {
             board.forEach((card: Card) => {
               if (card.value === 1) localWinner = true
             })
-            // console.info('gameIndex=0', JSON.stringify({ board }))
-
             const winner: boolean = result.game?.winner as boolean
             expect(winner).toEqual(localWinner)
           }
@@ -195,24 +185,17 @@ describe(`GQL Test`, () => {
   }, 60000)
 
   it(`Testing getStreak, comparing to actual results`, async () => {
-    const { id: streakId, query: streakQuery } = STREAK_QUERY('gql-test-session')
-    console.info(JSON.stringify({ streakId, streakQuery }, null, 4))
+    const { query: streakQuery } = STREAK_QUERY('gql-test-session')
     const streakResultWrap = await graphql(schema, streakQuery)
     const result = streakResultWrap?.data?.getStreak
-    // console.info('streak', JSON.stringify({ result }, null, 4))
     // calc streak independently:
     const winner = winners[winners.length - 1]
     let streakLength = 1
-    // console.info(JSON.stringify({ winners: [...winners] }, null, 4))
     for (let i = winners.length - 2; i >= 0; i--) {
-      // console.info('for each winner', i)
       const currentWinner = winners[i]
-
-      // if (i === 0) winner = currentWinner || false
       if (winner !== currentWinner) break
       streakLength++
     }
-    console.info('WINNERS:', JSON.stringify({ winners, winner, length: streakLength }, null, 4))
     return expect({
       success: result.success,
       winner: result.streak?.winner,

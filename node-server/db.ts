@@ -24,14 +24,8 @@ const pool: Pool = new Pool({
   database: 'uplifty',
   port: 5432,
 })
-/* pool.on('error', err => {
-  console.error('Unexpected error on idle client', err)
-  throw new Error(`Unexpected error on idle client ${err}`)
-})  */
 async function query(q: string, v?: any[]): Promise<QueryResult> {
   const client = await pool.connect()
-
-  // console.info('query:', q, v)
 
   let res
   try {
@@ -54,18 +48,12 @@ export async function lazyInitSchema() {
       'node_%',
     ])
     if (schemaResponse.rows?.length < 2) {
-      // console.info('schema is missing')
       await query(
         'CREATE TABLE IF NOT EXISTS node_games (game_id SERIAL PRIMARY KEY,session_id VARCHAR(126),ended BOOLEAN ,time_started TIMESTAMP,time_ended TIMESTAMP,winner BOOLEAN)'
       )
-      // console.info('table node_games create result', JSON.stringify(createResult))
       await query(
         `CREATE TABLE IF NOT EXISTS node_cards (card_id SERIAL PRIMARY KEY ,game_id INT, collection_type INT, ordinal INT, value INT, suit INT);`
       )
-      // console.info('table node_cards create result', createResult)
-    } else {
-      // console.info('schema is present')
-      // console.info('rows', JSON.stringify(schemaResponse.rows))
     }
   } catch (error) {
     console.error('Caught exception in lazyInitSchema:', error)
@@ -129,7 +117,6 @@ export async function startGame(sessionID: string, deck: Card[]): Promise<number
       'INSERT INTO node_games(session_id,ended, time_started,time_ended,winner) VALUES( $1 ,FALSE,NOW(),NOW(),FALSE) RETURNING game_id;',
       [sessionID]
     )
-    // console.info('startGame:gamekResult', gameResult.rows[0])
     const gameId = gameResult.rows[0].game_id
     const inserts = []
     for (let ordinal = 0; ordinal < deck.length; ordinal += 1) {
@@ -161,7 +148,6 @@ export async function getGame(sessionID: string, gameId: number): Promise<Game> 
     )
     const results = await Promise.all([deckPromise, boardPromise, cardsUsedPromise, gamePromise])
 
-    // console.info('game from db:', results[3].rows[0])
     if (!results[3].rows?.length)
       throw new Error(`The game ${gameId} for session ${sessionID} is missing`)
     const game = {
@@ -178,6 +164,44 @@ export async function getGame(sessionID: string, gameId: number): Promise<Game> 
     throw error
   }
 }
+export async function getCurrentGame(sessionID: string): Promise<Game> {
+  try {
+    await lazyInitSchema()
+
+    const gameResults = await query(
+      `SELECT game_id,ended,winner from node_games where session_id=$1 and ended=false ORDER BY time_ended desc LIMIT 1`,
+      [sessionID]
+    )
+    if (!gameResults.rows?.length)
+      return {
+        gameId: 0,
+        ended: false,
+        winner: false,
+        deck: [] as Card[],
+        board: [] as Card[],
+        cardsUsed: [] as Card[],
+      }
+    const game = {
+      gameId: gameResults.rows[0].game_id,
+      ended: gameResults.rows[0].ended,
+      winner: gameResults.rows[0].winner,
+    }
+    const deckPromise = getCards(game.gameId, CollectionType.Deck)
+    const boardPromise = getCards(game.gameId, CollectionType.Board)
+    const cardsUsedPromise = getCards(game.gameId, CollectionType.CardsUsed)
+
+    const results = await Promise.all([deckPromise, boardPromise, cardsUsedPromise])
+
+    const deck = results[0]
+    const board = results[1]
+    const cardsUsed = results[2]
+    return (Object.assign(game, { deck, board, cardsUsed }) as unknown) as Game
+  } catch (error) {
+    console.error('Caught exception in getGame:', error)
+    throw error
+  }
+}
+
 export async function updateGame(sessionID: string, game: Game) {
   try {
     const deckPromise = updateCards(game.gameId, CollectionType.Deck, game.deck)
@@ -212,7 +236,6 @@ export async function getStreak(
     let ordinal = 0
 
     const winner = await singleGame(ordinal++)
-    // console.info('singleGame after first game', { winner, ordinal })
     let currentWinner = winner
     streak = 0
     while (winner === currentWinner) {
@@ -222,11 +245,8 @@ export async function getStreak(
 
       if (typeof currentWinner === 'undefined') {
         break
-        // console.info('singleGame after next game', { currentWinner, ordinal, streak })
       }
     }
-
-    console.info('db:getStreak', { sessionID, winner, streak })
     return { winner, streak }
   } catch (error) {
     console.error('Caught exception in getStreak:', error)
@@ -236,9 +256,6 @@ export async function getStreak(
 
 // for testing
 export async function dropSchema() {
-  console.info('starting db test')
   await query(`DROP TABLE IF EXISTS node_games;`)
-  console.info('after drop node_games')
   await query(`DROP TABLE IF EXISTS node_cards;`)
-  console.info('after drop node_cards')
 }

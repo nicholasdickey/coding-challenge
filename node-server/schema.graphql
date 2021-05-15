@@ -36,6 +36,7 @@ type StreakResult {
 }
 type Query {
   getStreak(sessionID: String): StreakResult
+  getCurrentGame(sessionID: String): GameResult
 }
 
 type Mutation {

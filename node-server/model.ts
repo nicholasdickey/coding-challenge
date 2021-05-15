@@ -1,4 +1,14 @@
-import { startGame, getGame, updateGame, getStreak, resetSession, Game, Card, Streak } from './db'
+import {
+  startGame,
+  getGame,
+  updateGame,
+  getStreak,
+  resetSession,
+  getCurrentGame,
+  Game,
+  Card,
+  Streak,
+} from './db'
 
 enum Suits {
   hearts,
@@ -64,7 +74,6 @@ const dealHand = ({
   if (outDeck.length === 0) {
     for (let i = 0; i < board.length; i += 1) {
       if (board[i].value === ACE) {
-        console.info('SET WINNER:TRUE')
         outWinner = true
         break
       }
@@ -96,4 +105,7 @@ export async function streak(sessionID: string): Promise<Streak> {
 }
 export async function clearSession(sessionID: string): Promise<boolean> {
   return resetSession(sessionID)
+}
+export async function currentGame(sessionID: string): Promise<Game> {
+  return getCurrentGame(sessionID)
 }

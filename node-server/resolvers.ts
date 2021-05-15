@@ -1,5 +1,5 @@
 import { GameResult, StreakResult } from './graphql-types'
-import { shuffle, nextHand, streak, clearSession } from './model'
+import { shuffle, nextHand, streak, clearSession, currentGame } from './model'
 
 export const resolvers = {
   Query: {
@@ -11,7 +11,6 @@ export const resolvers = {
       }
       try {
         const streakWrapper = await streak(sessionID)
-        console.info('STREAK RESOLVER', JSON.stringify({ streakWrapper }, null, 4))
         streakResult.success = true
         streakResult.streak = {
           winner: streakWrapper.winner,
@@ -23,10 +22,25 @@ export const resolvers = {
       }
       return streakResult
     },
+    getCurrentGame: async (parent: any, args: any, context: any): Promise<GameResult> => {
+      // eslint-disable-next-line
+      const { sessionID } = context ? context : args
+      const gameResult: GameResult = {
+        success: false,
+      }
+
+      try {
+        gameResult.game = await currentGame(sessionID)
+        gameResult.success = true
+      } catch (error) {
+        console.error(error)
+        gameResult.msg = error // in the real world, message would be less revealing, perhaps some code
+      }
+      return gameResult
+    },
   },
   Mutation: {
     shuffle: async (parent: any, args: any, context: any): Promise<GameResult> => {
-      //  console.info('STARTING shuffle mutation')
       // eslint-disable-next-line
       const { sessionID } = context ? context : args
       const gameResult: GameResult = {
@@ -39,16 +53,6 @@ export const resolvers = {
         console.error(error)
         gameResult.msg = error // in the real world, message would be less revealing, perhaps some code
       }
-      /* console.info(
-        'Resolver returning game:',
-        JSON.stringify(
-          {
-            gameResult,
-          },
-          null,
-          4
-        )
-      ) */
       return gameResult
     },
     nextHand: async (parent: any, args: any, context: any): Promise<GameResult> => {
@@ -65,16 +69,6 @@ export const resolvers = {
         console.error(error)
         gameResult.msg = error // in the real world, message would be less revealing, perhaps some code
       }
-      /*  console.info(
-        'Deal Resolver returning game:',
-        JSON.stringify(
-          {
-            gameResult,
-          },
-          null,
-          4
-        )
-      ) */
       return gameResult
     },
     resetSession: async (parent: any, args: any, context: any): Promise<{ success: boolean }> => {
